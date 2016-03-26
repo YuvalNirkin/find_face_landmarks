@@ -1,5 +1,5 @@
-%DLIB_FIND_FACE_LANDMARKS Find face landmarks in a video or image sequence
-%   frames = DLIB_FIND_FACE_LANDMARKS(modelFile, inputPath, scale) 
+%FIND_FACE_LANDMARKS Find face landmarks in a video or image sequence
+%   frames = FIND_FACE_LANDMARKS(modelFile, inputPath, scale) 
 %   Input:
 %       modelFile - Path to the landmarks model file
 %       inputPath - Path to a video file or a directory containing a
@@ -14,6 +14,6 @@
 %       [x y width height], and its detected landmarks as a n-by-2 matrix
 %       (n is the number of points in the model). 
 %
-%   frames = DLIB_FIND_FACE_LANDMARKS(modelFile, device, width, height, scale) 
+%   frames = FIND_FACE_LANDMARKS(modelFile, device, width, height, scale) 
 %   this is the live version. device is the camera's id to start the 
 %   preview from. width and height are the requested preview resolution.
