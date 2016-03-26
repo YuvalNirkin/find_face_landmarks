@@ -1,0 +1,2 @@
+addpath 'mex'
+addpath 'utilities'
