@@ -1,2 +1,5 @@
 % Add current folder and all subfolders to search path
-addpath(genpath(fileparts(mfilename('fullpath'))));
+scriptPath = mfilename('fullpath');
+[rootPath, filename, fileextension]= fileparts(scriptPath);
+addpath(fullfile(rootPath, 'mex'));
+addpath(fullfile(rootPath, 'utilities'));
