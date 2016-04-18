@@ -24,7 +24,7 @@ Frontalization<br />
  booktitle = {IEEE Conf. on Computer Vision and Pattern Recognition (CVPR)},<br />
  month	=  {June},<br />
  year 	= {2015},<br />
- URL 	= {\url{http://www.openu.ac.il/home/hassner/projects/frontalize}}<br />
+ URL 	= {Available:~http://www.openu.ac.il/home/hassner/projects/frontalize}<br />
 }<br />
 
 ## Dependencies
