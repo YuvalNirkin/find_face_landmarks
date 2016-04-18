@@ -10,7 +10,7 @@ DLIB<br />
 @article{king2009dlib,<br />
   title={Dlib-ml: A machine learning toolkit},<br />
   author={King, Davis E},<br />
-  journal=JMLR,<br />
+  journal={J. Mach. Learning Research},<br />
   volume={10},<br />
   pages={1755--1758},<br />
   year={2009},<br />
