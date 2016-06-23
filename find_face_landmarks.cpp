@@ -26,7 +26,7 @@
 using std::cout;
 using std::endl;
 using std::string;
-using std::exception;
+using std::runtime_error;
 
 /************************************************************************************
 *									 Declarations									*
@@ -48,7 +48,7 @@ namespace dlib
         for (size_t j = 0; j < shapes.size(); ++j)
         {
             if (shapes[j].num_parts() != 68)
-                throw exception("Each shape size must be exactly 68!");
+                throw runtime_error("Each shape size must be exactly 68!");
 
             const dlib::full_object_detection& d = shapes[j];
             for (unsigned long i = 1; i <= 16; ++i)
@@ -168,7 +168,7 @@ namespace dlib
         cv::putText(frameScaled, "press any key to stop", cv::Point(10, frameScaled.rows - 20),
             cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(255, 255, 255),
             1, CV_AA);
-        cv::imshow("dlib_find_face_landmarks", frameScaled);
+        cv::imshow("find_face_landmarks", frameScaled);
         int key = cv::waitKey(1);
         if (key >= 0) running = false;
     }
@@ -179,7 +179,7 @@ namespace dlib
         int faceCount = 0;
 
         // Open video source
-        if(!vs->open()) throw exception("Failed to open video source!");
+        if(!vs->open()) throw runtime_error("Failed to open video source!");
         int width = vs->getWidth();
         int height = vs->getHeight();
 
@@ -225,8 +225,8 @@ namespace dlib
         find_face_landmarks(modelPath, vs, false, frames);
 
         // Cleanup
+        cv::destroyWindow("find_face_landmarks");
         delete vs;
-        cv::destroyAllWindows();
     }
 
     void find_face_landmarks(const std::string& modelPath,
@@ -241,8 +241,8 @@ namespace dlib
         find_face_landmarks(modelPath, vs, true, frames);
 
         // Cleanup
+        cv::destroyWindow("find_face_landmarks");
         delete vs;
-        cv::destroyAllWindows();
     }
 
     /*

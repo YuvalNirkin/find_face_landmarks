@@ -7,14 +7,14 @@
 #include <exception>
 #include <mex.h>
 #include "MxArray.hpp"
-#include <opencv2\imgproc.hpp>
+#include <opencv2/imgproc.hpp>
 
 /************************************************************************************
 *									  Namespaces									*
 ************************************************************************************/
 using std::vector;
 using std::string;
-using std::exception;
+using std::runtime_error;
 
 /************************************************************************************
 *									 Declarations									*
@@ -32,13 +32,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         vector<dlib::Frame> frames;
 
         // Parse input
-        if (nrhs == 0) throw exception("No parameters specified!");
-        if (!MxArray(prhs[0]).isChar()) throw exception(
+        if (nrhs == 0) throw runtime_error("No parameters specified!");
+        if (!MxArray(prhs[0]).isChar()) throw runtime_error(
             "modelFile must be a string containing the path to the model file!");
         string modelFile = MxArray(prhs[0]).toString();
         if (nrhs == 2 || nrhs == 3)
         {
-            if (!MxArray(prhs[1]).isChar()) throw exception(
+            if (!MxArray(prhs[1]).isChar()) throw runtime_error(
                 "inputPath must be a string containing the path a video file"
                 " or a directory of images!");
             string inputPath = MxArray(prhs[1]).toString();
@@ -55,9 +55,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                 dlib::frame_scale = MxArray(prhs[4]).toDouble();
             dlib::find_face_landmarks(modelFile, device, width, height, frames);
         }
-        else throw exception("Invalid number of parameters!");
+        else throw runtime_error("Invalid number of parameters!");
 
-        if (frames.empty()) throw exception("Failed to read from video source!");
+        if (frames.empty()) throw runtime_error("Failed to read from video source!");
 
         ///
         // Output results
@@ -112,7 +112,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mxSetField(plhs[0], i, frame_fields[2], MxArray(frame.height));
         }
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         //printfFnc("Error: %s", e.what());
         mexErrMsgIdAndTxt("dlib_find_face_landmarks:parsing", "Error: %s", e.what());
