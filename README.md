@@ -1,6 +1,8 @@
 # find_face_landmarks
 A Matlab MEX function for finding face landmarks and bounding box using dlib.
 
+![alt text](https://3.bp.blogspot.com/-bk69Sd5LTHk/V25XMfVMY1I/AAAAAAAAC9A/jiP6e5geTUQxAo8WCp36Z3L3CqlWqzbxgCLcB/s400/076_small_landmarks.PNG "Demonstration")
+
 This MEX is released as part of the face frontalization project:
 http://www.openu.ac.il/home/hassner/projects/frontalize
 
@@ -30,7 +32,7 @@ Frontalization<br />
 ## Dependencies
 1. [vsal](https://github.com/YuvalNirkin/vsal)
 2. [dlib](http://dlib.net/)
-3. [OpenCV](http://opencv.org/)
+3. [OpenCV (3.0+)](http://opencv.org/)
 4. [Matlab](http://www.mathworks.com/products/matlab/)
 
 ## Installation
