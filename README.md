@@ -38,8 +38,8 @@ Frontalization<br />
 
 ## Installation
 - Use CMake to build and install the mex function.
-- Add <installion_root>/bin to path.
-- Add <installion_root>/interfaces/matlab to Matlab's path
+- Add find_face_landmarks/bin to path.
+- Add find_face_landmarks/interfaces/matlab to Matlab's path
 - Download the landmarks model file: [shape_predictor_68_face_landmarks.dat](http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2)
 - Use show_face_landmarks function to display the output from find_face_landmarks
 
