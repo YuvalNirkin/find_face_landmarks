@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package sfl.io;
+
+message Sequence {
+	repeated Frame frames = 1;
+}
+
+message Frame {
+	repeated Face faces = 1;
+	uint32 width = 2;
+	uint32 height = 3;
+}
+
+message Face {
+	BoundingBox bbox = 1;
+	repeated Point landmarks = 2;
+}
+
+message BoundingBox {
+	int32 left = 1;
+	int32 top = 2;
+	uint32 width = 3;
+	uint32 height = 4;
+}
+
+message Point {
+	int32 x = 1;
+	int32 y = 2;
+}
