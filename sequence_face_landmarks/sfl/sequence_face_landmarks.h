@@ -14,17 +14,20 @@ namespace sfl
 	*/
     struct Face
     {
-		cv::Rect bbox;
-        std::vector<cv::Point> landmarks;
+		int id;								///< Face id.
+		cv::Rect bbox;						///< Bounding box.
+        std::vector<cv::Point> landmarks;	///< Face landmarks.
+		
     };
 
 	/** @brief Represents a frame that might include faces.
 	*/
     struct Frame
     {
-        std::vector<Face> faces;
-        int width;
-        int height;
+		int id;						///< Frame id.
+		int width;					///< Frame width [pixels]
+		int height;					///< Frame height [pixels]
+        std::vector<Face> faces;	///< Detected faces in the frame
     };
 
 	/** @brief Interface for sequence face landmarks functionality.
@@ -36,8 +39,10 @@ namespace sfl
 	public:
 
 		/** @brief Add a frame to process.
+		@param frame The frame to process [BGR|Grayscale].
+		@param id Frame id. If negative, an internal counter will be used instead.
 		*/
-		virtual const Frame& addFrame(const cv::Mat& frame) = 0;
+		virtual const Frame& addFrame(const cv::Mat& frame, int id = -1) = 0;
 
 		/** @brief Get the frame sequence with all landmarks and bounding boxes 
 		for each detected face.

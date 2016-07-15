@@ -4,9 +4,9 @@
 #  FIND_FACE_LANDMARKS_LIBRARIES    - libraries to link against
 #  FIND_FACE_LANDMARKS_EXECUTABLE   - the find_face_landmarks executable
  
-# Compute paths
+# Calculated paths
 get_filename_component(FIND_FACE_LANDMARKS_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
-set(FIND_FACE_LANDMARKS_INCLUDE_DIRS ${FIND_FACE_LANDMARKS_CMAKE_DIR}/include)
+set(FIND_FACE_LANDMARKS_INCLUDE_DIRS "@CMAKE_INSTALL_PREFIX@/include")
 
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET find_face_landmarks AND NOT find_face_landmarks_BINARY_DIR)
@@ -14,7 +14,7 @@ if(NOT TARGET find_face_landmarks AND NOT find_face_landmarks_BINARY_DIR)
 endif()
  
 # These are IMPORTED targets created by find_face_landmarks-targets.cmake
-set(FIND_FACE_LANDMARKS_LIBRARIES find_face_landmarks)
+set(FIND_FACE_LANDMARKS_LIBRARIES sequence_face_landmarks)
 if(TARGET find_face_landmarks)
 	set(FIND_FACE_LANDMARKS_EXECUTABLE cache_face_landmarks)
 endif()

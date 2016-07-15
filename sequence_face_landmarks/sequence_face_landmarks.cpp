@@ -25,7 +25,7 @@ namespace sfl
 	{
 	public:
 		SequenceFaceLandmarksImpl(const std::string& modelPath, float frame_scale) :
-			m_frame_scale(frame_scale)
+			m_frame_scale(frame_scale), m_frame_counter(0)
 		{
 			setModel(modelPath);
 		}
@@ -33,13 +33,18 @@ namespace sfl
 		SequenceFaceLandmarksImpl(float frame_scale) :
 			m_frame_scale(frame_scale) {}
 
-		const Frame& addFrame(const cv::Mat& frame)
+		const Frame& addFrame(const cv::Mat& frame, int id)
 		{
 			if (m_model_path.empty()) 
 				throw runtime_error("A landmarks model file is not set!");
 
+			// Set frame id
+			int frame_id = id;
+			if (id < 0) frame_id = m_frame_counter++;
+			else m_frame_counter = id + 1;
+
 			// Extract landmarks by number of channels
-			m_frames.push_back({ {}, frame.cols, frame.rows });
+			m_frames.push_back({ frame_id, frame.cols, frame.rows, {} });
 			if (frame.channels() == 3)  // BGR
 				extract_landmarks<dlib::bgr_pixel>(frame, m_frames.back());
 			else // grayscale
@@ -53,6 +58,7 @@ namespace sfl
 		void clear()
 		{
 			m_frames.clear();
+			m_frame_counter = 0;
 		}
 
 #ifdef WITH_PROTOBUF
@@ -72,14 +78,16 @@ namespace sfl
 			for (const io::Frame& io_frame : sequence.frames())
 			{
 				Frame frame;
-				frame.width = io_frame.width();
-				frame.height = io_frame.height();
+				frame.id = (int)io_frame.id();
+				frame.width = (int)io_frame.width();
+				frame.height = (int)io_frame.height();
 				frame.faces.reserve(io_frame.faces_size());
 
 				// For each face detected in the frame
 				for (const io::Face& io_face : io_frame.faces())
 				{
 					Face face;
+					face.id = io_face.id();
 					const io::BoundingBox& io_bbox = io_face.bbox();
 					face.bbox.x = io_bbox.left();
 					face.bbox.y = io_bbox.top();
@@ -107,6 +115,7 @@ namespace sfl
 			for (const Frame& frame : m_frames)
 			{
 				io::Frame* io_frame = sequence.add_frames();
+				io_frame->set_id((unsigned int)frame.id);
 				io_frame->set_width(frame.width);
 				io_frame->set_height(frame.height);
 
@@ -114,6 +123,7 @@ namespace sfl
 				for (const Face& face : frame.faces)
 				{
 					io::Face* io_face = io_frame->add_faces();
+					io_face->set_id((unsigned int)face.id);
 					io::BoundingBox* io_bbox = io_face->mutable_bbox();
 					io_bbox->set_left(face.bbox.x);
 					io_bbox->set_top(face.bbox.y);
@@ -181,6 +191,11 @@ namespace sfl
 			{
 				Face& face = frame_landmarks.faces[i];
 				dlib::rectangle& dlib_face = faces[i];
+
+				// Set face id
+				face.id = i;
+
+				// Set landmarks
 				dlib::full_object_detection shape = m_pose_model(dlib_frame, dlib_face);
 				dlib_obj_to_points(shape, face.landmarks);
 
@@ -214,8 +229,9 @@ namespace sfl
 
 	protected:
 		std::vector<Frame> m_frames;
-		float m_frame_scale;
 		std::string m_model_path;
+		float m_frame_scale;
+		int m_frame_counter;
 
 		// dlib
 		dlib::frontal_face_detector m_detector;
@@ -273,7 +289,7 @@ namespace sfl
 		}
 		else
 		{
-			for (size_t i = 0; i < 68; ++i)
+			for (size_t i = 0; i < landmarks.size(); ++i)
 				cv::circle(img, landmarks[i], thickness, color, -1);
 		}
 
@@ -282,7 +298,7 @@ namespace sfl
 			// Add labels
 			for (size_t i = 0; i < landmarks.size(); ++i)
 				cv::putText(img, std::to_string(i), landmarks[i],
-					cv::FONT_HERSHEY_PLAIN, 0.5, color, thickness);
+					cv::FONT_HERSHEY_PLAIN, 1.0, color, thickness);
 		}
 	}
 
@@ -297,6 +313,10 @@ namespace sfl
 	{
 		render(img, face.bbox, bbox_color, thickness);
 		render(img, face.landmarks, drawLabels, landmarks_color, thickness);
+
+		// Add face id label
+		cv::putText(img, std::to_string(face.id), cv::Point(face.bbox.x, face.bbox.y),
+			cv::FONT_HERSHEY_PLAIN, 1.0, bbox_color, thickness);
 	}
 
 	void render(cv::Mat& img, const Frame& frame, bool drawLabels,

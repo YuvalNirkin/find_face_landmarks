@@ -2,8 +2,9 @@
 set(SFL_SRC sequence_face_landmarks.cpp)
 set(SFL_INCLUDE sfl/sequence_face_landmarks.h)
 if(WITH_PROTOBUF)
-	protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS sequence_face_landmarks.proto)
-	set(SFL_SRC ${SFL_SRC} ${PROTO_SRCS} ${PROTO_HDRS})
+	set(PROTO_FILES sequence_face_landmarks.proto)
+	protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
+	set(SFL_SRC ${SFL_SRC} ${PROTO_SRCS} ${PROTO_HDRS} ${PROTO_FILES})
 	add_definitions(-DWITH_PROTOBUF)
 endif()
 

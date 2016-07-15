@@ -7,14 +7,16 @@ message Sequence {
 }
 
 message Frame {
-	repeated Face faces = 1;
+	uint32 id = 1;
 	uint32 width = 2;
 	uint32 height = 3;
+	repeated Face faces = 4;	
 }
 
 message Face {
-	BoundingBox bbox = 1;
-	repeated Point landmarks = 2;
+	uint32 id = 1;
+	BoundingBox bbox = 2;
+	repeated Point landmarks = 3;
 }
 
 message BoundingBox {
