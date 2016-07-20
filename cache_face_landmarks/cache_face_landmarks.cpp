@@ -5,6 +5,7 @@
 // Boost
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 
 // sfl
 #include <sfl/sequence_face_landmarks.h>
@@ -30,7 +31,7 @@ int main(int argc, char* argv[])
 {
 	// Parse command line arguments
 	string inputPath, outputPath, landmarksModelPath;
-	float frame_scale;
+	std::vector<float> frame_scales;
 	bool preview;
 	try {
 		options_description desc("Allowed options");
@@ -39,7 +40,8 @@ int main(int argc, char* argv[])
 			("input,i", value<string>(&inputPath)->required(), "path to video sequence")
 			("output,o", value<string>(&outputPath), "output path")
 			("landmarks,l", value<string>(&landmarksModelPath)->required(), "path to landmarks model file")
-			("scale,s", value<float>(&frame_scale)->default_value(1.0f), "frame scale for finding small faces")
+			("scales,s", value<std::vector<float>>(&frame_scales)->default_value({ 1.0f }, "{1}"),
+				"frame scales for finding small faces. Best scale will be selected")
 			("preview,p", value<bool>(&preview)->default_value(true), "preview landmarks")
 			;
 		variables_map vm;
@@ -62,59 +64,86 @@ int main(int argc, char* argv[])
 	try
 	{
 		// Initialize Sequence Face Landmarks
-		std::shared_ptr<sfl::SequenceFaceLandmarks> sfl =
-			sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scale);
-
-		// Create video source
-		vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
-		std::unique_ptr<vsal::VideoStreamOpenCV> vs(
-			(vsal::VideoStreamOpenCV*)vsf.create(inputPath));
-		if (vs == nullptr) throw runtime_error("No video source specified!");
-
-		// Open video source
-		if (!vs->open()) throw runtime_error("Failed to open video source!");
-
-		// Main loop
-		cv::Mat frame;
-		int faceCounter = 0;
-		while (vs->read())
+		std::vector<std::shared_ptr<sfl::SequenceFaceLandmarks>> sfls(frame_scales.size());
+		sfls[0] = sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scales[0]);
+		for (int i = 1; i < frame_scales.size(); ++i)
 		{
-			if (!vs->isUpdated()) continue;
-
-			frame = vs->getFrame();
-			const sfl::Frame& landmarks_frame = sfl->addFrame(frame);
-			
-			if (preview)
-			{
-				faceCounter += landmarks_frame.faces.size();
-
-				// Render landmarks
-				sfl::render(frame, landmarks_frame);
-
-				// Render overlay
-				string msg = "Faces found so far: " + std::to_string(faceCounter);
-				cv::putText(frame, msg, cv::Point(15, 15),
-					cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1, CV_AA);
-				cv::putText(frame, "press any key to stop", cv::Point(10, frame.rows - 20),
-					cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(255, 255, 255), 1, CV_AA);
-
-				// Show frame
-				cv::imshow("cache_face_landmarks", frame);
-				int key = cv::waitKey(1);
-				if (key >= 0) break;
-			}
+			sfls[i] = sfls[0]->clone();
+			sfls[i]->setFrameScale(frame_scales[i]);
 		}
 
-		// Set output path
-		path input = path(inputPath);
-		if (outputPath.empty()) outputPath = 
-			(input.parent_path() / (input.stem() += "_landmarks.pb")).string();
-		else if (is_directory(outputPath))	outputPath = 
-			(path(outputPath) / (input.stem() += "_landmarks.pb")).string();
+		int max_faces = 0;
+		std::shared_ptr<sfl::SequenceFaceLandmarks> best_sfl;
 
-		// Saving to file
-		cout << "Saving landmarks to \"" << outputPath << "\"." << endl;
-		sfl->save(outputPath);
+		// For each sfl configuration
+		for (auto& sfl : sfls)
+		{
+			// Create video source
+			vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
+			std::unique_ptr<vsal::VideoStreamOpenCV> vs(
+				(vsal::VideoStreamOpenCV*)vsf.create(inputPath));
+			if (vs == nullptr) throw runtime_error("No video source specified!");
+
+			// Open video source
+			if (!vs->open()) throw runtime_error("Failed to open video source!");
+
+			// Main loop
+			cv::Mat frame;
+			int faceCounter = 0;
+			while (vs->read())
+			{
+				if (!vs->isUpdated()) continue;
+
+				frame = vs->getFrame();
+				const sfl::Frame& landmarks_frame = sfl->addFrame(frame);
+
+				if (preview)
+				{
+					faceCounter += landmarks_frame.faces.size();
+
+					// Render landmarks
+					sfl::render(frame, landmarks_frame);
+
+					// Render overlay
+					
+					string msg = (boost::format("Current frame scale: %.1f") % sfl->getFrameScale()).str();
+					cv::putText(frame, msg, cv::Point(15, 15),
+						cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+					msg = "Faces found so far: " + std::to_string(faceCounter);
+					cv::putText(frame, msg, cv::Point(15, 45),
+						cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+					cv::putText(frame, "press any key to stop", cv::Point(10, frame.rows - 20),
+						cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+
+					// Show frame
+					cv::imshow("cache_face_landmarks", frame);
+					int key = cv::waitKey(1);
+					if (key >= 0) break;
+				}
+			}
+
+			if (faceCounter > max_faces)
+			{
+				max_faces = faceCounter;
+				best_sfl = sfl;
+			}
+		}
+		
+		if (best_sfl)
+		{
+			// Set output path
+			path input = path(inputPath);
+			if (outputPath.empty()) outputPath =
+				(input.parent_path() / (input.stem() += "_landmarks.pb")).string();
+			else if (is_directory(outputPath))	outputPath =
+				(path(outputPath) / (input.stem() += "_landmarks.pb")).string();
+
+			// Saving to file
+			cout << "Best scale: " << (boost::format("%.1f") % best_sfl->getFrameScale()).str() << endl;
+			cout << "Total faces found: " + std::to_string(max_faces) << endl;
+			cout << "Saving landmarks to \"" << outputPath << "\"." << endl;
+			best_sfl->save(outputPath);
+		}
 	}
 	catch (std::exception& e)
 	{

@@ -3,6 +3,7 @@
 
 // std
 #include <string>
+#include <list>
 #include <memory>
 
 // OpenCV
@@ -27,7 +28,7 @@ namespace sfl
 		int id;						///< Frame id.
 		int width;					///< Frame width [pixels]
 		int height;					///< Frame height [pixels]
-        std::vector<Face> faces;	///< Detected faces in the frame
+        std::list<std::unique_ptr<Face>> faces;	///< Detected faces in the frame
     };
 
 	/** @brief Interface for sequence face landmarks functionality.
@@ -47,11 +48,28 @@ namespace sfl
 		/** @brief Get the frame sequence with all landmarks and bounding boxes 
 		for each detected face.
 		*/
-		virtual const std::vector<Frame>& getSequence() const = 0;
+		virtual const std::list<std::unique_ptr<Frame>>& getSequence() const = 0;
 
 		/** @brief Clear all processed or loaded data.
 		*/
 		virtual void clear() = 0;
+
+		/** @brief Create a full copy, loaded face detector and landmark model 
+		will be shared.
+		*/
+		virtual std::shared_ptr<SequenceFaceLandmarks> clone() = 0;
+
+		/** @brief Get landmarks model file.
+		*/
+		virtual std::string getModel() const = 0;
+
+		/** @brief Get frame scale.
+		*/
+		virtual float getFrameScale() const = 0;
+
+		/** @brief Get if tracking faces is enabled or disabled.
+		*/
+		virtual bool getTrackFaces() const = 0;
 
 		/** @brief Load a sequence of face landmarks from file.
 		*/
@@ -61,17 +79,22 @@ namespace sfl
 		*/
 		virtual void save(const std::string& filePath) const = 0;
 
+		/** @brief Set frame scale.
+		*/
+		virtual void setFrameScale(float frame_scale) = 0;
+
 		/** @brief Set landmarks model file.
 		*/
 		virtual void setModel(const std::string& modelPath) = 0;
 
+		/** @brief Enable\disable tracking faces across the sequence of frames.
+			This will keep the face ids consistent in the sequence.
+		*/
+		virtual void setTrackFaces(bool track_faces) = 0;
+		
 		/** @brief Get the number of the current frames.
 		*/
 		virtual size_t size() const = 0;
-
-		/** @brief Get frame at index
-		*/
-		virtual const Frame& operator[](size_t i) const = 0;
 
 		/** @brief Create an instance initialized with a landmarks model file.
 		@param modelPath The landmarks model file.
@@ -79,14 +102,15 @@ namespace sfl
 		faces. The landmarks will still be in the original frame's pixel coordinates.
 		*/
 		static std::shared_ptr<SequenceFaceLandmarks> create(
-			const std::string& modelPath, float frame_scale = 1.0f);
+			const std::string& modelPath, float frame_scale = 1.0f,
+			bool track_faces = false);
 
 		/** @brief Create an instance.
 		@frame_scale Each frame will be scaled by this factor. Useful for detection of small
 		faces. The landmarks will still be in the original frame's pixel coordinates.
 		*/
 		static std::shared_ptr<SequenceFaceLandmarks> create(
-			float frame_scale = 1.0f);
+			float frame_scale = 1.0f, bool track_faces = false);
 	};
 
 	/** @brief Render landmarks.

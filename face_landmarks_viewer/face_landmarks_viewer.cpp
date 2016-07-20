@@ -87,16 +87,19 @@ int main(int argc, char* argv[])
 		cv::Mat frame;
 		int faceCounter = 0;
 		size_t frameCounter = 0;
+		const std::list<std::unique_ptr<sfl::Frame>>& sfl_frames = sfl->getSequence();
+		std::list<std::unique_ptr<sfl::Frame>>::const_iterator it = sfl_frames.begin();
 		while (vs->read())
 		{
 			if (!vs->isUpdated()) continue;
 
 			frame = vs->getFrame();
-			const sfl::Frame& landmarks_frame = (*sfl)[frameCounter++];
-			faceCounter += landmarks_frame.faces.size();
+			const std::unique_ptr<sfl::Frame>& sfl_frame = *it++;
+			//const sfl::Frame& landmarks_frame = (*sfl)[frameCounter++];
+			faceCounter += sfl_frame->faces.size();
 
 			// Render landmarks
-			sfl::render(frame, landmarks_frame);
+			sfl::render(frame, *sfl_frame);
 
 			// Show overlay
 			string msg = "Faces count: " + std::to_string(faceCounter);
