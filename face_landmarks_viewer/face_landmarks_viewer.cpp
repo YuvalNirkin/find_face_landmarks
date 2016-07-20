@@ -95,7 +95,6 @@ int main(int argc, char* argv[])
 
 			frame = vs->getFrame();
 			const std::unique_ptr<sfl::Frame>& sfl_frame = *it++;
-			//const sfl::Frame& landmarks_frame = (*sfl)[frameCounter++];
 			faceCounter += sfl_frame->faces.size();
 
 			// Render landmarks
