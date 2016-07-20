@@ -28,7 +28,7 @@ option(BUILD_INTERFACE_MATLAB "Build interface for Matlab" ON)
 
 # Find dependencies
 # ===================================================
-find_package(OpenCV REQUIRED highgui imgproc imgcodecs)
+find_package(OpenCV REQUIRED highgui imgproc imgcodecs features2d)
 find_package(dlib REQUIRED)
 
 # Boost

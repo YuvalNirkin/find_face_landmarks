@@ -19,6 +19,10 @@
 %   this is the live version. device is the camera's id to start the 
 %   preview from. width and height are the requested preview resolution.
 %
+%	frames = FIND_FACE_LANDMARKS(inputPath) Load from cache. If inputPath
+%	is a .pb file it will be loaded, else a cache file by the name
+%	<video_name>_landmarks.pb will be searched for in the same directory.
+%
 %   Examples
 %       modelFile = 'shape_predictor_68_face_landmarks.dat';
 %
@@ -36,3 +40,9 @@
 %
 %       % live camera stream
 %       frames = find_face_landmarks(modelFile, 0);
+%
+%		% Load from cache
+%		frames = find_face_landmarks('video_landmarks.pb');
+%
+%       % Load from cache by searching for 'video_landmarks.pb'
+%       frames = find_face_landmarks('video.mp4');

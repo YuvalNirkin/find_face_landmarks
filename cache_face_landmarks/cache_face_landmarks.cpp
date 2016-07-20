@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	// Parse command line arguments
 	string inputPath, outputPath, landmarksModelPath;
 	std::vector<float> frame_scales;
-	bool preview;
+	bool preview, track;
 	try {
 		options_description desc("Allowed options");
 		desc.add_options()
@@ -42,6 +42,7 @@ int main(int argc, char* argv[])
 			("landmarks,l", value<string>(&landmarksModelPath)->required(), "path to landmarks model file")
 			("scales,s", value<std::vector<float>>(&frame_scales)->default_value({ 1.0f }, "{1}"),
 				"frame scales for finding small faces. Best scale will be selected")
+			("track,t", value<bool>(&track)->default_value(false), "track faces across frames")
 			("preview,p", value<bool>(&preview)->default_value(true), "preview landmarks")
 			;
 		variables_map vm;
@@ -65,7 +66,7 @@ int main(int argc, char* argv[])
 	{
 		// Initialize Sequence Face Landmarks
 		std::vector<std::shared_ptr<sfl::SequenceFaceLandmarks>> sfls(frame_scales.size());
-		sfls[0] = sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scales[0]);
+		sfls[0] = sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scales[0], track);
 		for (int i = 1; i < frame_scales.size(); ++i)
 		{
 			sfls[i] = sfls[0]->clone();
@@ -89,7 +90,7 @@ int main(int argc, char* argv[])
 
 			// Main loop
 			cv::Mat frame;
-			int faceCounter = 0;
+			int frameCounter = 0, faceCounter = 0;
 			while (vs->read())
 			{
 				if (!vs->isUpdated()) continue;
@@ -105,13 +106,19 @@ int main(int argc, char* argv[])
 					sfl::render(frame, landmarks_frame);
 
 					// Render overlay
-					
-					string msg = (boost::format("Current frame scale: %.1f") % sfl->getFrameScale()).str();
+					string msg = "Frame count: " + std::to_string(++frameCounter);
 					cv::putText(frame, msg, cv::Point(15, 15),
 						cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
 					msg = "Faces found so far: " + std::to_string(faceCounter);
-					cv::putText(frame, msg, cv::Point(15, 45),
+					cv::putText(frame, msg, cv::Point(15, 40),
 						cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+					msg = (boost::format("Current frame scale: %.1f") % sfl->getFrameScale()).str();
+					cv::putText(frame, msg, cv::Point(15, 65),
+						cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+					msg = "Tracking: " + std::string(track ? "Enabled" : "Disabled");
+					cv::putText(frame, msg, cv::Point(15, 90),
+						cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+					
 					cv::putText(frame, "press any key to stop", cv::Point(10, frame.rows - 20),
 						cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
 

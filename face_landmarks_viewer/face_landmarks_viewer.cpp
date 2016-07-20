@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 			
 			// Show frame
 			cv::imshow("face_landmarks_viewer", frame);
-			int key = cv::waitKey(30);
+			int key = cv::waitKey(45);
 			if (key >= 0) break;
 		}
 	}

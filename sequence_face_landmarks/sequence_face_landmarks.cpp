@@ -67,11 +67,11 @@ namespace sfl
 			else // grayscale
 				extract_landmarks<unsigned char>(frame, *sfl_frame);
 
+			// Track faces if enabled
 			if (m_track_faces)
-			{
 				m_face_tracker->addFrame(frame, *sfl_frame);
-			}
 
+			// Save and output current frame
 			m_frames.push_back(std::move(sfl_frame));
 			return *m_frames.back();
 		}
