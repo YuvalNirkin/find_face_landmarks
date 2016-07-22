@@ -293,81 +293,11 @@ namespace sfl
 		return std::make_shared<SequenceFaceLandmarksImpl>(frame_scale, track_faces);
 	}
 
-	void render(cv::Mat & img, const std::vector<cv::Point>& landmarks,
-		bool drawLabels, const cv::Scalar & color, int thickness)
+	const Face* Frame::getFace(int id) const
 	{
-		if (landmarks.size() == 68)
-		{
-			for (size_t i = 1; i <= 16; ++i)
-				cv::line(img, landmarks[i], landmarks[i - 1], color, thickness);
-
-			for (size_t i = 28; i <= 30; ++i)
-				cv::line(img, landmarks[i], landmarks[i - 1], color, thickness);
-
-			for (size_t i = 18; i <= 21; ++i)
-				cv::line(img, landmarks[i], landmarks[i - 1], color, thickness);
-
-			for (size_t i = 23; i <= 26; ++i)
-				cv::line(img, landmarks[i], landmarks[i - 1], color, thickness);
-
-			for (size_t i = 31; i <= 35; ++i)
-				cv::line(img, landmarks[i], landmarks[i - 1], color, thickness);
-			cv::line(img, landmarks[30], landmarks[35], color, thickness);
-
-			for (size_t i = 37; i <= 41; ++i)
-				cv::line(img, landmarks[i], landmarks[i - 1], color, thickness);
-			cv::line(img, landmarks[36], landmarks[41], color, thickness);
-
-			for (size_t i = 43; i <= 47; ++i)
-				cv::line(img, landmarks[i], landmarks[i - 1], color, thickness);
-			cv::line(img, landmarks[42], landmarks[47], color, thickness);
-
-			for (size_t i = 49; i <= 59; ++i)
-				cv::line(img, landmarks[i], landmarks[i - 1], color, thickness);
-			cv::line(img, landmarks[48], landmarks[59], color, thickness);
-
-			for (size_t i = 61; i <= 67; ++i)
-				cv::line(img, landmarks[i], landmarks[i - 1], color, thickness);
-			cv::line(img, landmarks[60], landmarks[67], color, thickness);
-		}
-		else
-		{
-			for (size_t i = 0; i < landmarks.size(); ++i)
-				cv::circle(img, landmarks[i], thickness, color, -1);
-		}
-
-		if (drawLabels)
-		{
-			// Add labels
-			for (size_t i = 0; i < landmarks.size(); ++i)
-				cv::putText(img, std::to_string(i), landmarks[i],
-					cv::FONT_HERSHEY_PLAIN, 1.0, color, thickness);
-		}
-	}
-
-	void render(cv::Mat& img, const cv::Rect& bbox, const cv::Scalar& color,
-		int thickness)
-	{
-		cv::rectangle(img, bbox, color, thickness);
-	}
-
-	void render(cv::Mat& img, const Face& face, bool drawLabels,
-		const cv::Scalar& bbox_color, const cv::Scalar& landmarks_color, int thickness)
-	{
-		render(img, face.bbox, bbox_color, thickness);
-		render(img, face.landmarks, drawLabels, landmarks_color, thickness);
-
-		// Add face id label
-		cv::Point lbl_pt(face.bbox.x + face.bbox.width / 2 - 2, face.bbox.y);
-		cv::putText(img, std::to_string(face.id), lbl_pt,
-			cv::FONT_HERSHEY_PLAIN, 1.0, bbox_color, thickness);
-	}
-
-	void render(cv::Mat& img, const Frame& frame, bool drawLabels,
-		const cv::Scalar& bbox_color, const cv::Scalar& landmarks_color, int thickness)
-	{
-		for (auto& face : frame.faces)
-			render(img, *face, drawLabels, bbox_color, landmarks_color, thickness);
+		for (auto& face : faces)
+			if (face->id == id) return face.get();
+		return nullptr;
 	}
 
 }   // namespace sfl

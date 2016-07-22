@@ -9,6 +9,7 @@
 
 // sfl
 #include <sfl/sequence_face_landmarks.h>
+#include <sfl/utilities.h>
 
 // vsal
 #include <vsal/VideoStreamFactory.h>
