@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.4)
 project(find_face_landmarks)
 
 # Set version
-set(FFL_MAJOR_VERSION 0)
-set(FFL_MINOR_VERSION 9)
+set(FFL_MAJOR_VERSION 1)
+set(FFL_MINOR_VERSION 0)
 set(FIND_FACE_LANDMARKS_VERSION ${FFL_MAJOR_VERSION}.${FFL_MINOR_VERSION})
 
 # Global configurations
