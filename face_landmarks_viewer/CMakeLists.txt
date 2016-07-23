@@ -29,3 +29,4 @@ set_target_properties(face_landmarks_viewer PROPERTIES DEBUG_POSTFIX _d)
 
 # Installations
 install(TARGETS face_landmarks_viewer EXPORT find_face_landmarks-targets DESTINATION bin COMPONENT bin)
+set(FFL_TARGETS ${FFL_TARGETS} face_landmarks_viewer)

@@ -113,6 +113,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				frame = vs->getFrame();
 				const sfl::Frame& landmarks_frame = sfl->addFrame(frame);
 
+                // Matlab and OpenCV's GUI do not play well on other playforms
+#ifdef _WIN32
 				if (preview)
 				{
 					faceCounter += landmarks_frame.faces.size();
@@ -132,6 +134,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					int key = cv::waitKey(1);
 					if (key >= 0) break;
 				}
+#endif  // _WIN32
 			}
 		}
 		else sfl->load(landmarksPath);		

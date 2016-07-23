@@ -1,7 +1,7 @@
 function cache_face_landmarks(varargin)
 %CACHE_FACE_LANDMARKS Cache face landmarks for multiple executions
 %   CACHE_FACE_LANDMARKS(input, landmarks, 'output', output,
-%   'scale', scale, 'verbose', verbose):
+%   'scale', scale, 'track', track, 'preview', preview):
 %   input - Path to an image, a video file, a directory containing a
 %       sequence of images, or a posix regular expression
 %   output - Output file path or path to an output directory

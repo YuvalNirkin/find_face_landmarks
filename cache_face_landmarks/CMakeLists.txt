@@ -29,3 +29,4 @@ set_target_properties(cache_face_landmarks PROPERTIES DEBUG_POSTFIX _d)
 
 # Installations
 install(TARGETS cache_face_landmarks EXPORT find_face_landmarks-targets DESTINATION bin COMPONENT bin)
+set(FFL_TARGETS ${FFL_TARGETS} cache_face_landmarks)

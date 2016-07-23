@@ -9,7 +9,7 @@ set(FIND_FACE_LANDMARKS_VERSION ${FFL_MAJOR_VERSION}.${FFL_MINOR_VERSION})
 # Global configurations
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 if(UNIX)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIC")
 else()
 	 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX")
 endif()
@@ -84,13 +84,11 @@ set(FFL_TARGETS sequence_face_landmarks)
 # cache_face_landmarks
 if(BUILD_CACHE_FACE_LANDMARKS)
 	add_subdirectory(cache_face_landmarks)
-	set(FFL_TARGETS ${FFL_TARGETS} cache_face_landmarks)
 endif()
 
 # face_landmarks_viewer
 if(BUILD_FACE_LANDMARKS_VIEWER)
 	add_subdirectory(face_landmarks_viewer)
-	set(FFL_TARGETS ${FFL_TARGETS} face_landmarks_viewer)
 endif()
 
 if(BUILD_DOCS)
