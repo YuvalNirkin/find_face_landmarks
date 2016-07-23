@@ -41,17 +41,11 @@ find_package(Boost COMPONENTS filesystem program_options)
 # vsal
 if(WITH_VSAL)
 	find_package(vsal)
-	if(NOT vsal_FOUND)
-		set(WITH_VSAL OFF CACHE BOOL "Video Stream Abstraction Layer" FORCE)	
-	endif()
 endif()
 
 # protobuf
 if(WITH_PROTOBUF)
 	find_package(protobuf)
-	if(NOT PROTOBUF_FOUND)
-		set(WITH_PROTOBUF OFF CACHE BOOL "Protocol Buffers - Google's data interchange format" FORCE)	
-	endif()
 endif()
 
 # Docs

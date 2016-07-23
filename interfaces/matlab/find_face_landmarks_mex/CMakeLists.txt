@@ -1,12 +1,12 @@
 # Validation
 if(NOT Boost_FOUND)
-	message(STATUS "find_face_landmarks won't be build because Boost is missing.")
+	message(STATUS "find_face_landmarks won't be built because Boost is missing.")
 	return()
 endif()
 
 # Validation
-if(NOT WITH_VSAL)
-	message(STATUS "find_face_landmarks won't be build because vsal is missing.")
+if(NOT vsal_FOUND)
+	message(STATUS "find_face_landmarks won't be built because vsal is missing.")
 	return()
 endif()
 

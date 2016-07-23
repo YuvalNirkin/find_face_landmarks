@@ -1,7 +1,12 @@
+# Validation
+if(NOT PROTOBUF_FOUND)
+	message(STATUS "sequence_face_landmarks will be built without loading and saving support because protobuf is missing.")
+endif()
+
 # Source
 set(SFL_SRC sequence_face_landmarks.cpp face_tracker.cpp utilities.cpp)
 set(SFL_INCLUDE sfl/sequence_face_landmarks.h sfl/face_tracker.h sfl/utilities.h)
-if(WITH_PROTOBUF)
+if(PROTOBUF_FOUND)
 	set(PROTO_FILES sequence_face_landmarks.proto)
 	protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 	set(SFL_SRC ${SFL_SRC} ${PROTO_SRCS} ${PROTO_HDRS} ${PROTO_FILES})
@@ -14,7 +19,7 @@ target_include_directories(sequence_face_landmarks PUBLIC
 	${OpenCV_INCLUDE_DIRS} ${dlib_INCLUDE_DIRS})
 target_link_libraries(sequence_face_landmarks PUBLIC 
 	${OpenCV_LIBS} ${dlib_LIBRARIES})
-if(WITH_PROTOBUF)
+if(PROTOBUF_FOUND)
 	target_include_directories(sequence_face_landmarks PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 	target_include_directories(sequence_face_landmarks PUBLIC ${PROTOBUF_INCLUDE_DIRS})
 	target_link_libraries(sequence_face_landmarks PUBLIC ${PROTOBUF_LIBRARIES})
