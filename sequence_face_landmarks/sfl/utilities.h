@@ -1,3 +1,7 @@
+/** @file
+@brief Sequence face landmarks utility functions.
+*/
+
 #ifndef __SFL_UTILITIES__
 #define __SFL_UTILITIES__
 
