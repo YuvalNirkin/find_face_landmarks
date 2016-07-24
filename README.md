@@ -5,15 +5,16 @@ Created by Yuval Nirkin.
 
 ## Overview
 This library provides video\image sequence functionality for finding face landmarks and bounding boxes.
+
+![alt text](https://3.bp.blogspot.com/-bk69Sd5LTHk/V25XMfVMY1I/AAAAAAAAC9A/jiP6e5geTUQxAo8WCp36Z3L3CqlWqzbxgCLcB/s400/076_small_landmarks.PNG "Demonstration")
+
 Main features:
 - Matlab interface.
 - Saving and loading per sequence.
 - Face tracking across frames in a sequence.
 - Face statistics for finding the most dominant face.
 
-![alt text](https://3.bp.blogspot.com/-bk69Sd5LTHk/V25XMfVMY1I/AAAAAAAAC9A/jiP6e5geTUQxAo8WCp36Z3L3CqlWqzbxgCLcB/s400/076_small_landmarks.PNG "Demonstration")
-
-This MEX is released as part of the face frontalization project:
+This library is released as part of the face frontalization project:
 http://www.openu.ac.il/home/hassner/projects/frontalize
 
 ## Dependencies
