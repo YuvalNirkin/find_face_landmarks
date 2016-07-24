@@ -18,7 +18,7 @@ This library is released as part of the face frontalization project:
 http://www.openu.ac.il/home/hassner/projects/frontalize
 
 ## Dependencies
-| Language                                            | Minimum Version | Notes                                    |
+| Library                                             | Minimum Version | Notes                                    |
 |-----------------------------------------------------|-----------------|------------------------------------------|
 | [Boost](http://www.boost.org/)                      | 1.47            |                                          |
 | [OpenCV](http://opencv.org/)                        | 3.0             |                                          |
