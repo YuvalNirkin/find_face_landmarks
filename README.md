@@ -1,11 +1,39 @@
 # find_face_landmarks
-A Matlab MEX function for finding face landmarks and bounding box using dlib.
+Created by Yuval Nirkin.
+
+[nirkin.com](http://www.nirkin.com/)
+
+## Overview
+This library provides video\image sequence functionality for finding face landmarks and bounding boxes.
+Main features:
+- Matlab interface.
+- Saving and loading per sequence.
+- Face tracking across frames in a sequence.
+- Face statistics for finding the most dominant face.
 
 ![alt text](https://3.bp.blogspot.com/-bk69Sd5LTHk/V25XMfVMY1I/AAAAAAAAC9A/jiP6e5geTUQxAo8WCp36Z3L3CqlWqzbxgCLcB/s400/076_small_landmarks.PNG "Demonstration")
 
 This MEX is released as part of the face frontalization project:
 http://www.openu.ac.il/home/hassner/projects/frontalize
 
+## Dependencies
+| Language                                            | Minimum Version | Notes                                    |
+|-----------------------------------------------------|-----------------|------------------------------------------|
+| [Boost](http://www.boost.org/)                      | 1.47            |                                          |
+| [OpenCV](http://opencv.org/)                        | 3.0             |                                          |
+| [dlib](http://dlib.net/)                            | 18.18           |                                          |
+| [vsal](https://github.com/YuvalNirkin/vsal)         | 1.0             |                                          |
+| [protobuf](https://github.com/google/protobuf)      | 3.0.0           | Optional - For loading and saving        |
+| [Matlab](http://www.mathworks.com/products/matlab/) | 2012a           | Optional - For building the MEX function |
+
+## Installation
+- Use CMake to build and install the mex function.
+- Add find_face_landmarks/bin to path.
+- Add find_face_landmarks/interfaces/matlab to Matlab's path
+- Download the landmarks model file: [shape_predictor_68_face_landmarks.dat](http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2)
+- Use show_face_landmarks function to display the output from find_face_landmarks
+
+## Bibliography
 If you find this code useful, please make sure to add suitable references to the original DLIB library and the frontalization paper. Bib items for both are:<br />
 <br />
 DLIB<br />
@@ -28,22 +56,3 @@ Frontalization<br />
  year 	= {2015},<br />
  URL 	= {Available:~http://www.openu.ac.il/home/hassner/projects/frontalize}<br />
 }<br />
-
-## Dependencies
-1. [vsal](https://github.com/YuvalNirkin/vsal)
-2. [dlib](http://dlib.net/)
-3. [OpenCV (3.0+)](http://opencv.org/)
-4. [protobuf (optional)](https://github.com/google/protobuf)
-5. [Matlab](http://www.mathworks.com/products/matlab/)
-
-## Installation
-- Use CMake to build and install the mex function.
-- Add find_face_landmarks/bin to path.
-- Add find_face_landmarks/interfaces/matlab to Matlab's path
-- Download the landmarks model file: [shape_predictor_68_face_landmarks.dat](http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2)
-- Use show_face_landmarks function to display the output from find_face_landmarks
-
-## Credit
-Created by Yuval Nirkin.
-
-https://il.linkedin.com/in/ynirkin
