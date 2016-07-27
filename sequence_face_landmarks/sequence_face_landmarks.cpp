@@ -8,6 +8,9 @@
 // std
 #include <exception>
 
+// Boost
+#include <boost/filesystem.hpp>
+
 // OpenCV
 #include <opencv2/imgproc.hpp>
 
@@ -19,17 +22,21 @@
 
 using std::string;
 using std::runtime_error;
+using namespace boost::filesystem;
 
 namespace sfl
 {
 	class SequenceFaceLandmarksImpl : public SequenceFaceLandmarks
 	{
 	public:
-		SequenceFaceLandmarksImpl(const std::string& modelPath, float frame_scale,
+		SequenceFaceLandmarksImpl(const std::string& landmarks_path, float frame_scale,
 			bool track_faces) :
 			m_frame_scale(frame_scale), m_frame_counter(0)
 		{
-			setModel(modelPath);
+			path landmarks(landmarks_path);
+			if (landmarks.extension() == ".pb") load(landmarks_path);
+			else setModel(landmarks_path);
+			
 			setTrackFaces(track_faces);
 		}
 
@@ -89,7 +96,7 @@ namespace sfl
 			return std::make_shared<SequenceFaceLandmarksImpl>(*this);
 		}
 
-		std::string getModel() const { return m_model_path; }
+		const std::string& getModel() const { return m_model_path; }
 
 		float getFrameScale() const { return m_frame_scale; }
 
@@ -281,10 +288,10 @@ namespace sfl
 	};
 
 	std::shared_ptr<SequenceFaceLandmarks> SequenceFaceLandmarks::create(
-		const std::string& modelPath, float frame_scale, bool track_faces)
+		const std::string& landmarks_path, float frame_scale, bool track_faces)
 	{
 		return std::make_shared<SequenceFaceLandmarksImpl>(
-			modelPath, frame_scale, track_faces);
+			landmarks_path, frame_scale, track_faces);
 	}
 
 	std::shared_ptr<SequenceFaceLandmarks> SequenceFaceLandmarks::create(

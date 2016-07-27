@@ -36,7 +36,7 @@ if(WIN32)
 	set(Boost_USE_STATIC_LIBS ON)	# only find static libs
 endif(WIN32)
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost COMPONENTS filesystem program_options)
+find_package(Boost REQUIRED filesystem program_options)
 
 # vsal
 if(WITH_VSAL)

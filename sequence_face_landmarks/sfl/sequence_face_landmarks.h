@@ -65,7 +65,7 @@ namespace sfl
 
 		/** @brief Get landmarks model file.
 		*/
-		virtual std::string getModel() const = 0;
+		virtual const std::string& getModel() const = 0;
 
 		/** @brief Get frame scale.
 		*/
@@ -101,12 +101,12 @@ namespace sfl
 		virtual size_t size() const = 0;
 
 		/** @brief Create an instance initialized with a landmarks model file.
-		@param modelPath The landmarks model file.
+		@param landmarks_path Path to the landmarks model file or landmarks cache file (.pb).
 		@frame_scale Each frame will be scaled by this factor. Useful for detection of small
 		faces. The landmarks will still be in the original frame's pixel coordinates.
 		*/
 		static std::shared_ptr<SequenceFaceLandmarks> create(
-			const std::string& modelPath, float frame_scale = 1.0f,
+			const std::string& landmarks_path, float frame_scale = 1.0f,
 			bool track_faces = false);
 
 		/** @brief Create an instance.

@@ -14,9 +14,14 @@ if(PROTOBUF_FOUND)
 endif()
 
 # Target
+if(WIN32)
+	link_directories(${Boost_LIBRARY_DIRS})
+else()
+	link_libraries(${Boost_LIBRARIES})
+endif()
 add_library(sequence_face_landmarks ${SFL_SRC} ${SFL_INCLUDE})
 target_include_directories(sequence_face_landmarks PUBLIC 
-	${OpenCV_INCLUDE_DIRS} ${dlib_INCLUDE_DIRS})
+	${Boost_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${dlib_INCLUDE_DIRS})
 target_link_libraries(sequence_face_landmarks PUBLIC 
 	${OpenCV_LIBS} ${dlib_LIBRARIES})
 if(PROTOBUF_FOUND)

@@ -86,8 +86,7 @@ int main(int argc, char* argv[])
 
 		// Preview loop
 		cv::Mat frame;
-		int faceCounter = 0;
-		size_t frameCounter = 0;
+		int frameCounter = 0, faceCounter = 0;
 		const std::list<std::unique_ptr<sfl::Frame>>& sfl_frames = sfl->getSequence();
 		std::list<std::unique_ptr<sfl::Frame>>::const_iterator it = sfl_frames.begin();
 		while (vs->read())
@@ -102,16 +101,19 @@ int main(int argc, char* argv[])
 			sfl::render(frame, *sfl_frame);
 
 			// Show overlay
-			string msg = "Faces count: " + std::to_string(faceCounter);
+			string msg = "Frame count: " + std::to_string(++frameCounter);
 			cv::putText(frame, msg, cv::Point(15, 15),
-				cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1, CV_AA);
+				cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+			msg = "Face count: " + std::to_string(faceCounter);
+			cv::putText(frame, msg, cv::Point(15, 40),
+				cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
 			cv::putText(frame, "press any key to stop", cv::Point(10, frame.rows - 20),
-				cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(255, 255, 255), 1, CV_AA);
+				cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
 			
 			// Show frame
 			cv::imshow("face_landmarks_viewer", frame);
-			int key = cv::waitKey(45);
-			if (key >= 0) break;
+			int key = cv::waitKey(0);
+			//if (key >= 0) break;
 		}
 	}
 	catch (std::exception& e)
