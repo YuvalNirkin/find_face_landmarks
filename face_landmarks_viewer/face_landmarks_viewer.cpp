@@ -32,12 +32,15 @@ int main(int argc, char* argv[])
 {
 	// Parse command line arguments
 	string inputPath, landmarksPath;
+	bool draw_ind;
 	try {
 		options_description desc("Allowed options");
 		desc.add_options()
 			("help", "display the help message")
 			("input,i", value<string>(&inputPath)->required(), "path to video sequence")
 			("landmarks,l", value<string>(&landmarksPath), "path to landmarks file (.pb)")
+			("draw_ind,d", value<bool>(&draw_ind)->default_value(false)->implicit_value(true),
+				"draw landmark indices")
 			;
 		variables_map vm;
 		store(command_line_parser(argc, argv).options(desc).
@@ -98,7 +101,7 @@ int main(int argc, char* argv[])
 			faceCounter += sfl_frame->faces.size();
 
 			// Render landmarks
-			sfl::render(frame, *sfl_frame);
+			sfl::render(frame, *sfl_frame, draw_ind);
 
 			// Show overlay
 			string msg = "Frame count: " + std::to_string(++frameCounter);
@@ -112,8 +115,8 @@ int main(int argc, char* argv[])
 			
 			// Show frame
 			cv::imshow("face_landmarks_viewer", frame);
-			int key = cv::waitKey(0);
-			//if (key >= 0) break;
+			int key = cv::waitKey(45);
+			if (key >= 0) break;
 		}
 	}
 	catch (std::exception& e)

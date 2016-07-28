@@ -58,7 +58,7 @@ namespace sfl
 			// Add labels
 			for (size_t i = 0; i < landmarks.size(); ++i)
 				cv::putText(img, std::to_string(i), landmarks[i],
-					cv::FONT_HERSHEY_PLAIN, 1.0, color, thickness);
+					cv::FONT_HERSHEY_PLAIN, 0.5, color, thickness);
 		}
 	}
 
