@@ -69,22 +69,30 @@ namespace sfl
 	}
 
 	void render(cv::Mat& img, const Face& face, bool drawLabels,
-		const cv::Scalar& bbox_color, const cv::Scalar& landmarks_color, int thickness)
+		const cv::Scalar& bbox_color, const cv::Scalar& landmarks_color, int thickness,
+		double fontScale)
 	{
 		render(img, face.bbox, bbox_color, thickness);
 		render(img, face.landmarks, drawLabels, landmarks_color, thickness);
 
 		// Add face id label
-		cv::Point lbl_pt(face.bbox.x + face.bbox.width / 2 - 2, face.bbox.y);
+		std::string lbl = std::to_string(face.id);
+		int baseline = 0;
+		cv::Size textSize = cv::getTextSize(lbl, cv::FONT_HERSHEY_PLAIN,
+			fontScale, thickness, &baseline);
+		cv::Point lbl_pt(face.bbox.x + (face.bbox.width - textSize.width) / 2, 
+			face.bbox.y - textSize.height / 4);
 		cv::putText(img, std::to_string(face.id), lbl_pt,
-			cv::FONT_HERSHEY_PLAIN, 1.0, bbox_color, thickness);
+			cv::FONT_HERSHEY_PLAIN, fontScale, bbox_color, thickness);
 	}
 
 	void render(cv::Mat& img, const Frame& frame, bool drawLabels,
-		const cv::Scalar& bbox_color, const cv::Scalar& landmarks_color, int thickness)
+		const cv::Scalar& bbox_color, const cv::Scalar& landmarks_color, int thickness,
+		double fontScale)
 	{
 		for (auto& face : frame.faces)
-			render(img, *face, drawLabels, bbox_color, landmarks_color, thickness);
+			render(img, *face, drawLabels, bbox_color, landmarks_color, thickness,
+				fontScale);
 	}
 
 	void getSequenceStats(const std::list<std::unique_ptr<Frame>>& sequence,
