@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 				}
 			}
 
-			if (faceCounter > max_faces)
+			if (faceCounter > max_faces || !best_sfl)
 			{
 				max_faces = faceCounter;
 				best_sfl = sfl;
