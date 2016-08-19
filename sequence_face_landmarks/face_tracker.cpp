@@ -21,6 +21,7 @@ namespace sfl
 		cv::Mat descriptors;
 		std::vector<int> desc_ind;
 		Face* ref_face;
+        cv::Point2f pos;
 	};
 
 	class FaceTrackerImpl : public FaceTracker
@@ -57,7 +58,7 @@ namespace sfl
 				candidates.push_back(createTrackedFace(frame_gray, *face, sfl_frame.id));
 
 			// For each tracked face
-			double dist;
+			double dist, similarity_dist, spatial_dist;
 			cv::Mat_<double> distances(m_tracked_faces.size(), candidates.size());
 			double* distances_data = (double*)distances.data;
 			std::list<std::unique_ptr<TrackedFace>>::iterator best_candidate;
@@ -67,7 +68,9 @@ namespace sfl
 				std::list<std::unique_ptr<TrackedFace>>::iterator it;
 				for (it = candidates.begin(); it != candidates.end(); ++it)
 				{
-					dist = match(tracked_face.get(), it->get());
+                    similarity_dist = match(tracked_face.get(), it->get());
+                    spatial_dist = cv::norm(tracked_face->pos - (*it)->pos);
+                    dist = (similarity_dist + spatial_dist)*0.5f;
 					*distances_data++ = dist;
 				}
 			}
@@ -78,7 +81,7 @@ namespace sfl
 				std::list<std::unique_ptr<TrackedFace>>::iterator tracked_it, cand_it;
 				std::list<std::unique_ptr<TrackedFace>>::iterator best_tracked_it, best_cand_it;
 				double min_dist = std::numeric_limits<double>::max();
-				const double max_dist = 500.0f;
+				const double max_dist = 250.0f;
 				int i, j, best_i, best_j;
 				std::vector<std::pair<std::list<std::unique_ptr<TrackedFace>>::iterator,
 					std::list<std::unique_ptr<TrackedFace>>::iterator>> matches;
@@ -123,6 +126,7 @@ namespace sfl
 					(*match.first)->frame_id = sfl_frame.id;
 					(*match.first)->descriptors = (*match.second)->descriptors;
 					(*match.first)->desc_ind = (*match.second)->desc_ind;
+                    (*match.first)->pos = (*match.second)->pos;
 
 					// Output the tracked id and remove the candidate
 					(*match.second)->ref_face->id = (*match.first)->id;
@@ -199,6 +203,11 @@ namespace sfl
 				if ((int)std::round(pt.x - pt_ex.x + pt.y - pt_ex.y) != 0) continue;
 				tracked_face->desc_ind[j++] = i;
 			}
+
+            // Calculate position
+            for (const cv::KeyPoint& kp : tracked_face->landmarks)
+                tracked_face->pos += kp.pt;
+            tracked_face->pos /= (float)tracked_face->landmarks.size();
 
 			return tracked_face;
 		}
