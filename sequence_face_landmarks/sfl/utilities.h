@@ -90,6 +90,58 @@ namespace sfl
 	*/
 	int getMainFaceID(const std::vector<FaceStat>& stats);
 
+    /** @brief Get the face's left eye center position (right eye in the image).
+    @param landmarks 68 face points.
+    */
+    cv::Point2f getFaceLeftEye(const std::vector<cv::Point>& landmarks);
+
+    /** @brief Get the face's right eye center position (left eye in the image).
+    @param landmarks 68 face points.
+    */
+    cv::Point2f getFaceRightEye(const std::vector<cv::Point>& landmarks);
+
+    /** @brief Get the face's vertical angle [radians].
+    The angles are in the range [-75/180*pi, 75/180*pi].
+    When the face is looking up the angle will be positive and when it is
+    looking down it will be negative.
+    @param landmarks 68 face points.
+    */
+    float getFaceApproxVertAngle(const std::vector<cv::Point>& landmarks);
+
+    /** @brief Get the face's horizontal angle [radians].
+    The angles are in the range [-75/180*pi, 75/180*pi].
+    When the face is looking right (left in the image) the angle will be positive and
+    when it is looking left (right in the image) it will be negative.
+    @param landmarks 68 face points.
+    */
+    float getFaceApproxHorAngle(const std::vector<cv::Point>& landmarks);
+
+    /** @brief Get the face's tilt angle [radians].
+    The angles are in the range [-75/180*pi, 75/180*pi].
+    When the face is tilting left (right in the image) the angle will be positive and
+    when it is tilting right (left in the image) it will be negative.
+    @param landmarks 68 face points.
+    */
+    float getFaceApproxTiltAngle(const std::vector<cv::Point>& landmarks);
+
+    /** @brief Get the face's euler angles [radians].
+    The angles are in the range [-75/180*pi, 75/180*pi].
+    @param landmarks 68 face points.
+    @return Return a vector with the 3 euler angles.
+    The x axis represents vertical rotation angle, up is positive.
+    The y axis represents horizontal rotation angle, right is positive.
+    The z axis represents tilt rotation angle, left is positive.
+    */
+    cv::Point3f getFaceApproxEulerAngles(const std::vector<cv::Point>& landmarks);
+
+    /** @brief Get face bounding box from landmarks.
+    @param landmarks Face points.
+    @param frameSize The size of the image.
+    @param square Make the bounding box square (limited to frame boundaries).
+    */
+    cv::Rect getFaceBBoxFromLandmarks(const std::vector<cv::Point>& landmarks, 
+        const cv::Size& frameSize, bool square);
+
 }   // namespace sfl
 
 #endif	// __SFL_UTILITIES__

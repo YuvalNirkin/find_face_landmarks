@@ -8,6 +8,10 @@
 
 using std::runtime_error;
 
+const float MAX_DIST = 0.5f*sqrt(3.0f)*CV_PI;
+const float MIN_DIST = MAX_DIST / 20.0f;
+const float MAX_FACE_ANGLE = 75.0f;
+
 namespace sfl
 {
 	void render(cv::Mat & img, const std::vector<cv::Point>& landmarks,
@@ -207,5 +211,134 @@ namespace sfl
 
 		return best_id;
 	}
+
+    cv::Point2f getFaceLeftEye(const std::vector<cv::Point>& landmarks)
+    {
+        if (landmarks.size() != 68) return cv::Point2f();
+
+        cv::Point2f left_eye(0, 0);
+        for (size_t i = 42; i <= 47; ++i)
+            left_eye += cv::Point2f(landmarks[i]);
+
+        return (left_eye / 6);
+    }
+
+    cv::Point2f getFaceRightEye(const std::vector<cv::Point>& landmarks)
+    {
+        if (landmarks.size() != 68) return cv::Point2f();
+
+        cv::Point2f right_eye(0, 0);
+        for (size_t i = 36; i <= 41; ++i)
+            right_eye += cv::Point2f(landmarks[i]);
+
+        return (right_eye / 6);
+    }
+
+    float getFaceApproxVertAngle(const std::vector<cv::Point>& landmarks)
+    {
+        if (landmarks.size() != 68) return 0;
+        cv::Point2f left_eye = getFaceLeftEye(landmarks);
+        cv::Point2f right_eye = getFaceRightEye(landmarks);
+        cv::Point2f x1 = landmarks[0], x2 = landmarks[16];
+        cv::Point2f v = x2 - x1;
+        cv::Point2f right_eye_dir = x1 - right_eye;
+        cv::Point2f left_eye_dir = x1 - left_eye;
+        float x12_dist = cv::norm(v);
+        float d1 = v.cross(right_eye_dir) / x12_dist;
+        float d2 = v.cross(left_eye_dir) / x12_dist;
+        float d = (d1 + d2)*0.5f / cv::norm(left_eye - right_eye);
+        return d * (2 * MAX_FACE_ANGLE) * (CV_PI / 180.0f);
+    }
+
+    float getFaceApproxHorAngle(const std::vector<cv::Point>& landmarks)
+    {
+        if (landmarks.size() != 68) return 0;
+        const float max_angle = 75.0f;
+
+        const cv::Point& center = landmarks[27];
+        const cv::Point& left_eye = landmarks[42];
+        const cv::Point& right_eye = landmarks[39];
+        float left_dist = cv::norm(center - left_eye);
+        float right_dist = cv::norm(center - right_eye);
+        float d = (left_dist / (left_dist + right_dist) - 0.5f);
+
+        return d * (2 * MAX_FACE_ANGLE) * (CV_PI / 180.0f);
+    }
+
+    float getFaceApproxTiltAngle(const std::vector<cv::Point>& landmarks)
+    {
+        if (landmarks.size() != 68) return 0;
+
+        cv::Point2f left_eye = getFaceLeftEye(landmarks);
+        cv::Point2f right_eye = getFaceRightEye(landmarks);
+        cv::Point2f v = left_eye - right_eye;
+        return atan2(v.y, v.x);
+    }
+
+    cv::Point3f getFaceApproxEulerAngles(const std::vector<cv::Point>& landmarks)
+    {
+        float x = getFaceApproxVertAngle(landmarks);
+        float y = getFaceApproxHorAngle(landmarks);
+        float z = getFaceApproxTiltAngle(landmarks);
+
+        return cv::Point3f(x, y, z);
+    }
+
+    cv::Rect getFaceBBoxFromLandmarks(const std::vector<cv::Point>& landmarks,
+        const cv::Size& frameSize, bool square)
+    {
+        int xmin(std::numeric_limits<int>::max()), ymin(std::numeric_limits<int>::max()),
+            xmax(-1), ymax(-1), sumx(0), sumy(0);
+        for (const cv::Point& p : landmarks)
+        {
+            xmin = std::min(xmin, p.x);
+            ymin = std::min(ymin, p.y);
+            xmax = std::max(xmax, p.x);
+            ymax = std::max(ymax, p.y);
+            sumx += p.x;
+            sumy += p.y;
+        }
+
+        int width = xmax - xmin + 1;
+        int height = ymax - ymin + 1;
+        int centerx = (xmin + xmax) / 2;
+        int centery = (ymin + ymax) / 2;
+        int avgx = (int)std::round(sumx / landmarks.size());
+        int avgy = (int)std::round(sumy / landmarks.size());
+        int devx = centerx - avgx;
+        int devy = centery - avgy;
+        int dleft = (int)std::round(0.1*width) + abs(devx < 0 ? devx : 0);
+        int dtop = (int)std::round(height*(std::max(float(width) / height, 1.0f) * 2 - 1)) + abs(devy < 0 ? devy : 0);
+        int dright = (int)std::round(0.1*width) + abs(devx > 0 ? devx : 0);
+        int dbottom = (int)std::round(0.1*height) + abs(devy > 0 ? devy : 0);
+
+        // Limit to frame boundaries
+        xmin = std::max(0, xmin - dleft);
+        ymin = std::max(0, ymin - dtop);
+        xmax = std::min((int)frameSize.width - 1, xmax + dright);
+        ymax = std::min((int)frameSize.height - 1, ymax + dbottom);
+
+        // Make square
+        if (square)
+        {
+            int sq_width = std::max(xmax - xmin + 1, ymax - ymin + 1);
+            centerx = (xmin + xmax) / 2;
+            centery = (ymin + ymax) / 2;
+            xmin = centerx - ((sq_width - 1) / 2);
+            ymin = centery - ((sq_width - 1) / 2);
+            xmax = xmin + sq_width - 1;
+            ymax = ymin + sq_width - 1;
+
+            // Limit to frame boundaries
+            xmin = std::max(0, xmin);
+            ymin = std::max(0, ymin);
+            xmax = std::min((int)frameSize.width - 1, xmax);
+            ymax = std::min((int)frameSize.height - 1, ymax);
+        }
+
+        return cv::Rect(cv::Point(xmin, ymin), cv::Point(xmax, ymax));
+    }
+
+
 }   // namespace sfl
 
