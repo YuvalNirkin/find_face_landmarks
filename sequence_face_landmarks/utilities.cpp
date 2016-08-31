@@ -8,8 +8,6 @@
 
 using std::runtime_error;
 
-const float MAX_DIST = 0.5f*sqrt(3.0f)*CV_PI;
-const float MIN_DIST = MAX_DIST / 20.0f;
 const float MAX_FACE_ANGLE = 75.0f;
 
 namespace sfl
