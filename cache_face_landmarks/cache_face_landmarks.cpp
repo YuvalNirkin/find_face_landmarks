@@ -98,11 +98,10 @@ int main(int argc, char* argv[])
 
 				frame = vs->getFrame();
 				const sfl::Frame& landmarks_frame = sfl->addFrame(frame);
+                faceCounter += landmarks_frame.faces.size();
 
 				if (preview)
 				{
-					faceCounter += landmarks_frame.faces.size();
-
 					// Render landmarks
 					sfl::render(frame, landmarks_frame);
 
