@@ -41,7 +41,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		int device = -1;
 		int width = 0, height = 0;
 		float frame_scale = 1.0f;
-		bool preview = true;
+		bool track = true, preview = true;
 		if (nrhs == 0) throw runtime_error("No parameters specified!");
 		/*
 		if (nrhs < 2) throw runtime_error("Invalid number of parameters!");
@@ -69,7 +69,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			landmarksModelPath = MxArray(prhs[0]).toString();
 			inputPath = MxArray(prhs[1]).toString();
 			if (nrhs > 2) frame_scale = (float)MxArray(prhs[2]).toDouble();
-			if (nrhs > 3) preview = MxArray(prhs[3]).toBool();
+			if (nrhs > 3) track = MxArray(prhs[3]).toBool();
+            if (nrhs > 4) preview = MxArray(prhs[4]).toBool();
 
 			// Check for landmarks file
 			path input = path(inputPath);
@@ -85,12 +86,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			if (nrhs > 2) width = MxArray(prhs[2]).toInt();
 			if (nrhs > 3) height = MxArray(prhs[3]).toInt();
 			if (nrhs > 4) frame_scale = (float)MxArray(prhs[4]).toDouble();
+            if (nrhs > 5) track = MxArray(prhs[3]).toBool();
 		}
 		else throw runtime_error("Second parameter must be either a sequence path or a device id!");
 
 		// Initialize Sequence Face Landmarks
 		std::shared_ptr<sfl::SequenceFaceLandmarks> sfl =
-			sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scale);
+			sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scale, track);
 
 		if (landmarksPath.empty())
 		{
@@ -188,11 +190,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				mxSetField(facesStructArray, j, face_fields[0], MxArray(landmarks));
 
 				// Convert the bounding box to Matlab's pixel format
-//				cv::Mat bbox = (cv::Mat_<int>(1, 4) <<
-//					face->bbox.x + 1, face->bbox.y + 1, face->bbox.width, face->bbox.height);
+				cv::Mat bbox = (cv::Mat_<int>(1, 4) <<
+					face->bbox.x + 1, face->bbox.y + 1, face->bbox.width, face->bbox.height);
 
 				// Set the bounding to the field of the current face
-				mxSetField(facesStructArray, j, face_fields[1], MxArray(face->bbox));
+				mxSetField(facesStructArray, j, face_fields[1], MxArray(bbox));
 			}
 		}
 
@@ -201,6 +203,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	}
 	catch (std::exception& e)
 	{
-		mexErrMsgIdAndTxt("dlib_find_face_landmarks:parsing", "Error: %s", e.what());
+		mexErrMsgIdAndTxt("find_face_landmarks:parsing", "Error: %s", e.what());
 	}
 }
