@@ -24,7 +24,7 @@ namespace sfl
         cv::Point2f pos;
 	};
 
-	class FaceTrackerImpl : public FaceTracker
+	class FaceTrackerBRISK : public FaceTracker
 	{
 	protected:
 		int m_id_counter = 0;
@@ -32,11 +32,11 @@ namespace sfl
 		std::list<std::unique_ptr<TrackedFace>> m_tracked_faces;
 		
 	public:
-		FaceTrackerImpl() : m_desc_extractor(cv::BRISK::create())
+		FaceTrackerBRISK() : m_desc_extractor(cv::BRISK::create())
 		{
 		}
 
-		FaceTrackerImpl(const FaceTrackerImpl& ft) :
+		FaceTrackerBRISK(const FaceTrackerBRISK& ft) :
 			m_id_counter(ft.m_id_counter), m_desc_extractor(ft.m_desc_extractor)
 		{
 			// Deep copy tracked faces
@@ -153,7 +153,7 @@ namespace sfl
 
 		std::shared_ptr<FaceTracker> clone()
 		{
-			return std::make_shared<FaceTrackerImpl>(*this);
+			return std::make_shared<FaceTrackerBRISK>(*this);
 		}
 
 	private:	
@@ -234,10 +234,10 @@ namespace sfl
 		}
 	};
 
-	std::shared_ptr<FaceTracker> FaceTracker::create()
-	{
-		return std::make_shared<FaceTrackerImpl>();
-	}
+    std::shared_ptr<FaceTracker> createFaceTrackerBRISK()
+    {
+        return std::make_shared<FaceTrackerBRISK>();
+    }
 
 }   // namespace sfl
 

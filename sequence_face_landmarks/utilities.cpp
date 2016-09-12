@@ -337,6 +337,40 @@ namespace sfl
         return cv::Rect(cv::Point(xmin, ymin), cv::Point(xmax, ymax));
     }
 
+    void createFullFace(const std::vector<cv::Point>& landmarks, std::vector<cv::Point>& full_face)
+    {
+        if (landmarks.size() != 68) return;
+
+        // Jaw line
+        full_face = {
+            { landmarks[0] },
+            { landmarks[1] },
+            { landmarks[2] },
+            { landmarks[3] },
+            { landmarks[4] },
+            { landmarks[5] },
+            { landmarks[6] },
+            { landmarks[7] },
+            { landmarks[8] },
+            { landmarks[9] },
+            { landmarks[10] },
+            { landmarks[11] },
+            { landmarks[12] },
+            { landmarks[13] },
+            { landmarks[14] },
+            { landmarks[15] },
+            { landmarks[16] }
+        };
+
+        // Forehead
+        cv::Point dir = (landmarks[27] - landmarks[30]);
+        if (landmarks[26].x > landmarks[16].x) full_face.push_back(landmarks[26]);
+        full_face.push_back(landmarks[26] + dir);
+        full_face.push_back(landmarks[24] + dir);
+        full_face.push_back(landmarks[19] + dir);
+        full_face.push_back(landmarks[17] + dir);
+        if (landmarks[17].x < landmarks[0].x) full_face.push_back(landmarks[17]);
+    }
 
 }   // namespace sfl
 

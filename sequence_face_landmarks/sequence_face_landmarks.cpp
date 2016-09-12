@@ -30,25 +30,25 @@ namespace sfl
 	{
 	public:
 		SequenceFaceLandmarksImpl(const std::string& landmarks_path, float frame_scale,
-			bool track_faces) :
-			m_frame_scale(frame_scale), m_frame_counter(0)
+            FaceTrackingType tracking) :
+			m_frame_scale(frame_scale), m_frame_counter(0), m_tracking(TRACKING_NONE)
 		{
 			path landmarks(landmarks_path);
 			if (landmarks.extension() == ".pb") load(landmarks_path);
 			else setModel(landmarks_path);
 			
-			setTrackFaces(track_faces);
+			setTracking(tracking);
 		}
 
-		SequenceFaceLandmarksImpl(float frame_scale, bool track_faces) :
-			m_frame_scale(frame_scale), m_frame_counter(0) 
+		SequenceFaceLandmarksImpl(float frame_scale, FaceTrackingType tracking) :
+			m_frame_scale(frame_scale), m_frame_counter(0), m_tracking(TRACKING_NONE)
 		{
-			setTrackFaces(track_faces);
+			setTracking(tracking);
 		}
 
 		SequenceFaceLandmarksImpl(const SequenceFaceLandmarksImpl& sfl) : 
 			m_model_path(sfl.m_model_path), m_frame_scale(sfl.m_frame_scale),
-			m_frame_counter(sfl.m_frame_counter), m_track_faces(sfl.m_track_faces),
+			m_frame_counter(sfl.m_frame_counter), m_tracking(sfl.m_tracking),
 			m_detector(sfl.m_detector), m_pose_model(sfl.m_pose_model)
 		{
 			if (sfl.m_face_tracker) m_face_tracker = sfl.m_face_tracker->clone();
@@ -75,7 +75,7 @@ namespace sfl
 				extract_landmarks<unsigned char>(frame, *sfl_frame);
 
 			// Track faces if enabled
-			if (m_track_faces)
+			if (m_tracking != TRACKING_NONE)
 				m_face_tracker->addFrame(frame, *sfl_frame);
 
 			// Save and output current frame
@@ -84,6 +84,8 @@ namespace sfl
 		}
 
 		const std::list<std::unique_ptr<Frame>>& getSequence() const { return m_frames; }
+
+        std::list<std::unique_ptr<Frame>>& getSequenceMutable() { return m_frames; }
 
 		void clear()
 		{
@@ -100,7 +102,7 @@ namespace sfl
 
 		float getFrameScale() const { return m_frame_scale; }
 
-		bool getTrackFaces() const { return m_track_faces; }
+        FaceTrackingType getTracking() const { return m_tracking; }
 
 #ifdef WITH_PROTOBUF
 		void load(const std::string& filePath)
@@ -203,11 +205,16 @@ namespace sfl
 			dlib::deserialize(modelPath) >> m_pose_model;
 		}
 
-		void setTrackFaces(bool track_faces)
+		void setTracking(FaceTrackingType tracking)
 		{
-			m_track_faces = track_faces;
-			if (m_track_faces && !m_face_tracker)
-				m_face_tracker = FaceTracker::create();
+            if (m_tracking == tracking) return;
+            m_tracking = tracking;
+            if (m_tracking == TRACKING_BRISK)
+                m_face_tracker = createFaceTrackerBRISK();
+            else if (m_tracking == TRACKING_LBP)
+                m_face_tracker = createFaceTrackerLBP();
+            else
+                m_face_tracker = nullptr;
 		}
 
 		size_t size() const { return m_frames.size(); }
@@ -279,7 +286,7 @@ namespace sfl
 		std::string m_model_path;
 		float m_frame_scale;
 		int m_frame_counter;
-		bool m_track_faces;
+        FaceTrackingType m_tracking;
 		std::shared_ptr<FaceTracker> m_face_tracker;
 
 		// dlib
@@ -288,16 +295,16 @@ namespace sfl
 	};
 
 	std::shared_ptr<SequenceFaceLandmarks> SequenceFaceLandmarks::create(
-		const std::string& landmarks_path, float frame_scale, bool track_faces)
+		const std::string& landmarks_path, float frame_scale, FaceTrackingType tracking)
 	{
 		return std::make_shared<SequenceFaceLandmarksImpl>(
-			landmarks_path, frame_scale, track_faces);
+			landmarks_path, frame_scale, tracking);
 	}
 
 	std::shared_ptr<SequenceFaceLandmarks> SequenceFaceLandmarks::create(
-		float frame_scale, bool track_faces)
+		float frame_scale, FaceTrackingType tracking)
 	{
-		return std::make_shared<SequenceFaceLandmarksImpl>(frame_scale, track_faces);
+		return std::make_shared<SequenceFaceLandmarksImpl>(frame_scale, tracking);
 	}
 
 	const Face* Frame::getFace(int id) const

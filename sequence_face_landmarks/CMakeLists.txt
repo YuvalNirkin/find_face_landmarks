@@ -2,15 +2,21 @@
 if(NOT PROTOBUF_FOUND)
 	message(STATUS "sequence_face_landmarks will be built without loading and saving support because protobuf is missing.")
 endif()
+if(NOT WITH_OPENCV_CONTRIB OR NOT OpenCV_FOUND)
+	message(STATUS "sequence_face_landmarks will be built without LBP tracker because OpenCV Contrib is missing.")
+endif()
 
 # Source
-set(SFL_SRC sequence_face_landmarks.cpp face_tracker.cpp utilities.cpp)
+set(SFL_SRC sequence_face_landmarks.cpp face_tracker_brisk.cpp face_tracker_lbp.cpp utilities.cpp)
 set(SFL_INCLUDE sfl/sequence_face_landmarks.h sfl/face_tracker.h sfl/utilities.h)
 if(PROTOBUF_FOUND)
 	set(PROTO_FILES sequence_face_landmarks.proto)
 	protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 	set(SFL_SRC ${SFL_SRC} ${PROTO_SRCS} ${PROTO_HDRS} ${PROTO_FILES})
 	add_definitions(-DWITH_PROTOBUF)
+endif()
+if(WITH_OPENCV_CONTRIB AND OpenCV_FOUND)
+	add_definitions(-DWITH_OPENCV_CONTRIB)
 endif()
 
 # Target

@@ -15,6 +15,8 @@ namespace sfl
 	{
 	public:
 
+        virtual ~FaceTracker() {}
+
 		/** @brief Add a frame to process.
 		@param frame The frame to process [BGR|Grayscale].
 		@param sfl_frame The face landmarks frame to track the faces from. The faces 
@@ -29,11 +31,15 @@ namespace sfl
 		/** @brief Create a full copy of the face tracker.
 		*/
 		virtual std::shared_ptr<FaceTracker> clone() = 0;
-
-		/** @brief Create an instance of the face tracker.
-		*/
-		static std::shared_ptr<FaceTracker> create();
 	};
+
+    /** @brief Create an instance of the BRISK face tracker.
+    */
+    std::shared_ptr<FaceTracker> createFaceTrackerBRISK();
+
+    /** @brief Create an instance of the LBP face tracker.
+    */
+    std::shared_ptr<FaceTracker> createFaceTrackerLBP();
 
 }   // namespace sfl
 

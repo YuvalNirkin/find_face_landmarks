@@ -33,7 +33,8 @@ int main(int argc, char* argv[])
 	// Parse command line arguments
 	string inputPath, outputPath, landmarksModelPath;
 	std::vector<float> frame_scales;
-	bool preview, track;
+    unsigned int track;
+	bool preview;
 	try {
 		options_description desc("Allowed options");
 		desc.add_options()
@@ -43,7 +44,8 @@ int main(int argc, char* argv[])
 			("landmarks,l", value<string>(&landmarksModelPath)->required(), "path to landmarks model file")
 			("scales,s", value<std::vector<float>>(&frame_scales)->default_value({ 1.0f }, "{1}"),
 				"frame scales for finding small faces. Best scale will be selected")
-			("track,t", value<bool>(&track)->default_value(false), "track faces across frames")
+			("track,t", value<unsigned int>(&track)->default_value(0), 
+                "track faces across frames [0=NONE|1=BRISK|2=LBP]")
 			("preview,p", value<bool>(&preview)->default_value(true), "preview landmarks")
 			;
 		variables_map vm;
@@ -67,7 +69,8 @@ int main(int argc, char* argv[])
 	{
 		// Initialize Sequence Face Landmarks
 		std::vector<std::shared_ptr<sfl::SequenceFaceLandmarks>> sfls(frame_scales.size());
-		sfls[0] = sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scales[0], track);
+		sfls[0] = sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scales[0],
+            (sfl::FaceTrackingType)track);
 		for (int i = 1; i < frame_scales.size(); ++i)
 		{
 			sfls[i] = sfls[0]->clone();

@@ -142,6 +142,14 @@ namespace sfl
     cv::Rect getFaceBBoxFromLandmarks(const std::vector<cv::Point>& landmarks, 
         const cv::Size& frameSize, bool square);
 
+    /** @brief Create full face points from landmarks.
+    This will add the forehead part of the face.
+    @param landmarks Face points.
+    @param full_face The full face points.
+    */
+    void createFullFace(const std::vector<cv::Point>& landmarks,
+        std::vector<cv::Point>& full_face);
+
 }   // namespace sfl
 
 #endif	// __SFL_UTILITIES__

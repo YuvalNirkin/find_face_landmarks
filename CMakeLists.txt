@@ -14,22 +14,34 @@ else()
 	 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX")
 endif()
 
+include(CheckIncludeFileCXX)
+
 # Optional 3rd party components
 # ===================================================
 option(WITH_VSAL "Video Stream Abstraction Layer" ON)
 option(WITH_PROTOBUF "Protocol Buffers - Google's data interchange format" ON)
+option(WITH_OPENCV_CONTRIB "OpenCV's extra modules" ON)
 
 # Build components
 # ===================================================
 option(BUILD_CACHE_FACE_LANDMARKS "Build cache_face_landmarks application" ON)
 option(BUILD_FACE_LANDMARKS_VIEWER "Build face_landmarks_viewer application" ON)
+option(BUILD_SFL_TRACK "Build sfl_track application" ON)
 option(BUILD_DOCS "Build documentation using Doxygen" ON)
 option(BUILD_INTERFACE_MATLAB "Build interface for Matlab" ON)
 
 # Find dependencies
 # ===================================================
-find_package(OpenCV REQUIRED highgui imgproc imgcodecs features2d)
 find_package(dlib REQUIRED)
+
+# OpenCV
+find_package(OpenCV REQUIRED highgui imgproc imgcodecs features2d)
+if(WITH_OPENCV_CONTRIB)
+	check_include_file_cxx(opencv2/face/facerec.hpp WITH_OPENCV_CONTRIB)
+	if(WITH_OPENCV_CONTRIB)
+		find_package(OpenCV COMPONENTS face)
+	endif()
+endif()
 
 # Boost
 if(WIN32)
@@ -81,9 +93,11 @@ if(BUILD_CACHE_FACE_LANDMARKS)
 endif()
 
 # face_landmarks_viewer
-if(BUILD_FACE_LANDMARKS_VIEWER)
-	add_subdirectory(face_landmarks_viewer)
+if(BUILD_SFL_TRACK)
+	add_subdirectory(sfl_track)
 endif()
+
+# sfl_track
 
 if(BUILD_DOCS)
 	add_subdirectory(doc)

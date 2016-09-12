@@ -40,8 +40,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		std::string inputPath, landmarksModelPath, landmarksPath;
 		int device = -1;
 		int width = 0, height = 0;
+        int track = 1;
 		float frame_scale = 1.0f;
-		bool track = true, preview = true;
+		bool preview = true;
 		if (nrhs == 0) throw runtime_error("No parameters specified!");
 		/*
 		if (nrhs < 2) throw runtime_error("Invalid number of parameters!");
@@ -69,7 +70,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			landmarksModelPath = MxArray(prhs[0]).toString();
 			inputPath = MxArray(prhs[1]).toString();
 			if (nrhs > 2) frame_scale = (float)MxArray(prhs[2]).toDouble();
-			if (nrhs > 3) track = MxArray(prhs[3]).toBool();
+			if (nrhs > 3) track = MxArray(prhs[3]).toInt();
             if (nrhs > 4) preview = MxArray(prhs[4]).toBool();
 
 			// Check for landmarks file
@@ -92,7 +93,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		// Initialize Sequence Face Landmarks
 		std::shared_ptr<sfl::SequenceFaceLandmarks> sfl =
-			sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scale, track);
+			sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scale,
+            (sfl::FaceTrackingType)track);
 
 		if (landmarksPath.empty())
 		{

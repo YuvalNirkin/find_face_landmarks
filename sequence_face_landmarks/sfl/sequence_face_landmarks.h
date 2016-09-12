@@ -35,6 +35,15 @@ namespace sfl
 		const Face* getFace(int id) const;
     };
 
+    /** @brief Represents face tracking type.
+    */
+    enum FaceTrackingType
+    {
+        TRACKING_NONE = 0,
+        TRACKING_BRISK = 1,
+        TRACKING_LBP = 2
+    };
+
 	/** @brief Interface for sequence face landmarks functionality.
 
 	This class provide face landmarks functionality over a sequence of frames.
@@ -54,6 +63,11 @@ namespace sfl
 		*/
 		virtual const std::list<std::unique_ptr<Frame>>& getSequence() const = 0;
 
+        /** @brief Get the frame sequence with all landmarks and bounding boxes
+        for each detected face.
+        */
+        virtual std::list<std::unique_ptr<Frame>>& getSequenceMutable() = 0;
+
 		/** @brief Clear all processed or loaded data.
 		*/
 		virtual void clear() = 0;
@@ -71,9 +85,9 @@ namespace sfl
 		*/
 		virtual float getFrameScale() const = 0;
 
-		/** @brief Get if tracking faces is enabled or disabled.
+		/** @brief Get the current type of tracking.
 		*/
-		virtual bool getTrackFaces() const = 0;
+		virtual FaceTrackingType getTracking() const = 0;
 
 		/** @brief Load a sequence of face landmarks from file.
 		*/
@@ -91,10 +105,10 @@ namespace sfl
 		*/
 		virtual void setModel(const std::string& modelPath) = 0;
 
-		/** @brief Enable\disable tracking faces across the sequence of frames.
+		/** @brief Set tracking type [TRACKING_NONE | TRACKING_BRISK | TRACKING_LBP].
 			This will keep the face ids consistent in the sequence.
 		*/
-		virtual void setTrackFaces(bool track_faces) = 0;
+		virtual void setTracking(FaceTrackingType tracking) = 0;
 		
 		/** @brief Get the number of the current frames.
 		*/
@@ -104,17 +118,19 @@ namespace sfl
 		@param landmarks_path Path to the landmarks model file or landmarks cache file (.pb).
 		@frame_scale Each frame will be scaled by this factor. Useful for detection of small
 		faces. The landmarks will still be in the original frame's pixel coordinates.
+        @param tracking Tracking type [TRACKING_NONE | TRACKING_BRISK | TRACKING_LBP].
 		*/
 		static std::shared_ptr<SequenceFaceLandmarks> create(
 			const std::string& landmarks_path, float frame_scale = 1.0f,
-			bool track_faces = false);
+            FaceTrackingType tracking = TRACKING_NONE);
 
 		/** @brief Create an instance.
 		@frame_scale Each frame will be scaled by this factor. Useful for detection of small
 		faces. The landmarks will still be in the original frame's pixel coordinates.
+        @param tracking Tracking type [TRACKING_NONE | TRACKING_BRISK | TRACKING_LBP].
 		*/
 		static std::shared_ptr<SequenceFaceLandmarks> create(
-			float frame_scale = 1.0f, bool track_faces = false);
+			float frame_scale = 1.0f, FaceTrackingType tracking = TRACKING_NONE);
 	};
 
 }   // namespace sfl
