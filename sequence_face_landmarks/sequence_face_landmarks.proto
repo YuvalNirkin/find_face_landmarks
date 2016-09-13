@@ -4,6 +4,7 @@ package sfl.io;
 
 message Sequence {
 	repeated Frame frames = 1;
+    string input_path = 2;
 }
 
 message Frame {

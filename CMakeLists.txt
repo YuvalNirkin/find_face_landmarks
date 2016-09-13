@@ -25,7 +25,7 @@ option(WITH_OPENCV_CONTRIB "OpenCV's extra modules" ON)
 # Build components
 # ===================================================
 option(BUILD_CACHE_FACE_LANDMARKS "Build cache_face_landmarks application" ON)
-option(BUILD_FACE_LANDMARKS_VIEWER "Build face_landmarks_viewer application" ON)
+option(BUILD_SFL_VIEWER "Build sfl_viewer application" ON)
 option(BUILD_SFL_TRACK "Build sfl_track application" ON)
 option(BUILD_DOCS "Build documentation using Doxygen" ON)
 option(BUILD_INTERFACE_MATLAB "Build interface for Matlab" ON)
@@ -93,8 +93,8 @@ if(BUILD_CACHE_FACE_LANDMARKS)
 endif()
 
 # face_landmarks_viewer
-if(BUILD_FACE_LANDMARKS_VIEWER)
-	add_subdirectory(face_landmarks_viewer)
+if(BUILD_SFL_VIEWER)
+	add_subdirectory(sfl_viewer)
 endif()
 
 # sfl_track

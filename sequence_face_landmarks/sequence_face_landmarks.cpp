@@ -34,7 +34,8 @@ namespace sfl
 			m_frame_scale(frame_scale), m_frame_counter(0), m_tracking(TRACKING_NONE)
 		{
 			path landmarks(landmarks_path);
-			if (landmarks.extension() == ".pb") load(landmarks_path);
+			if (landmarks.extension() == ".pb" || landmarks.extension() == ".lms")
+                load(landmarks_path);
 			else setModel(landmarks_path);
 			
 			setTracking(tracking);
@@ -49,7 +50,8 @@ namespace sfl
 		SequenceFaceLandmarksImpl(const SequenceFaceLandmarksImpl& sfl) : 
 			m_model_path(sfl.m_model_path), m_frame_scale(sfl.m_frame_scale),
 			m_frame_counter(sfl.m_frame_counter), m_tracking(sfl.m_tracking),
-			m_detector(sfl.m_detector), m_pose_model(sfl.m_pose_model)
+			m_detector(sfl.m_detector), m_pose_model(sfl.m_pose_model),
+            m_input_path(sfl.m_input_path)
 		{
 			if (sfl.m_face_tracker) m_face_tracker = sfl.m_face_tracker->clone();
 		}
@@ -102,6 +104,8 @@ namespace sfl
 
 		float getFrameScale() const { return m_frame_scale; }
 
+        const std::string & getInputPath() const { return m_input_path; }
+
         FaceTrackingType getTracking() const { return m_tracking; }
 
 #ifdef WITH_PROTOBUF
@@ -115,6 +119,8 @@ namespace sfl
 			sequence.ParseFromIstream(&input);
 
 			// Convert format
+            m_input_path = sequence.input_path();
+
 			// For each frame in the sequence
 			for (const io::Frame& io_frame : sequence.frames())
 			{
@@ -150,6 +156,7 @@ namespace sfl
 		{
 			// Convert format
 			io::Sequence sequence;
+            sequence.set_input_path(m_input_path);
 
 			// For each frame in the sequence
 			for (auto& frame : m_frames)
@@ -204,6 +211,8 @@ namespace sfl
 			// Shape predictor for finding landmark positions given an image and face bounding box.
 			dlib::deserialize(modelPath) >> m_pose_model;
 		}
+
+        void setInputPath(const std::string& inputPath) { m_input_path = inputPath; }
 
 		void setTracking(FaceTrackingType tracking)
 		{
@@ -284,6 +293,7 @@ namespace sfl
 	protected:
 		std::list<std::unique_ptr<Frame>> m_frames;
 		std::string m_model_path;
+        std::string m_input_path;
 		float m_frame_scale;
 		int m_frame_counter;
         FaceTrackingType m_tracking;

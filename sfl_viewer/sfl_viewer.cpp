@@ -31,14 +31,15 @@ using namespace boost::filesystem;
 int main(int argc, char* argv[])
 {
 	// Parse command line arguments
-	string inputPath, landmarksPath;
+    std::vector<string> inputPaths;
+    string landmarksPath, videoPath;
 	bool draw_ind;
 	try {
 		options_description desc("Allowed options");
 		desc.add_options()
 			("help", "display the help message")
-			("input,i", value<string>(&inputPath)->required(), "path to video sequence")
-			("landmarks,l", value<string>(&landmarksPath), "path to landmarks file (.pb)")
+            ("input,i", value<std::vector<string>>(&inputPaths)->required(),
+                "path to video or landmarks (.lms) files")
 			("draw_ind,d", value<bool>(&draw_ind)->default_value(false)->implicit_value(true),
 				"draw landmark indices")
 			;
@@ -51,6 +52,26 @@ int main(int argc, char* argv[])
 			exit(0);
 		}
 		notify(vm);
+        if (inputPaths.size() > 2) throw error("Too many input arguments!");
+        for (string& inputPath : inputPaths)
+        {
+            path input = inputPath;
+            if (input.extension() == ".pb" || input.extension() == ".lms")
+            {
+                if (landmarksPath.empty()) landmarksPath = inputPath;
+                else throw error("Too many landmarks files specified!");
+            }
+            else if (videoPath.empty()) videoPath = inputPath;
+            else throw error("Too many video paths specified!");
+        }
+        if (!is_regular_file(landmarksPath) && is_regular_file(videoPath))
+        {
+            path video = path(videoPath);
+            landmarksPath =
+                (video.parent_path() / (video.stem() += ".lms")).string();
+            if (!is_regular_file(landmarksPath))
+                throw error("Couldn't find landmarks file!");
+        }
 	}
 	catch (const error& e) {
 		cout << "Error while parsing command-line arguments: " << e.what() << endl;
@@ -62,26 +83,22 @@ int main(int argc, char* argv[])
 	{
 		// Initialize Sequence Face Landmarks
 		std::shared_ptr<sfl::SequenceFaceLandmarks> sfl =
-			sfl::SequenceFaceLandmarks::create();
+			sfl::SequenceFaceLandmarks::create(landmarksPath);
 
-		// Set landmarks path
-		if (landmarksPath.empty())
-		{
-			path input = path(inputPath);
-			landmarksPath = 
-				(input.parent_path() / (input.stem() += "_landmarks.pb")).string();
-			if (!is_regular_file(landmarksPath)) 
-				throw runtime_error("Couldn't find landmarks file!");
-		}
-
-		// Load landmarks from file
-		cout << "Loading landmarks from \"" << landmarksPath << "\"" << endl;
-		sfl->load(landmarksPath);
+        // Validate video path
+        if (videoPath.empty())
+        {
+            if (!sfl->getInputPath().empty()) videoPath = sfl->getInputPath();
+            if (!is_regular_file(videoPath))
+                throw runtime_error("Couldn't find video sequence file!");
+        }
+        else if (is_regular_file(videoPath)) sfl->setInputPath(videoPath);
+        else throw runtime_error("Couldn't find video sequence file!");
 
 		// Create video source
 		vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
 		std::unique_ptr<vsal::VideoStreamOpenCV> vs(
-			(vsal::VideoStreamOpenCV*)vsf.create(inputPath));
+			(vsal::VideoStreamOpenCV*)vsf.create(videoPath));
 		if (vs == nullptr) throw runtime_error("No video source specified!");
 
 		// Open video source
@@ -92,7 +109,7 @@ int main(int argc, char* argv[])
 		int frameCounter = 0, faceCounter = 0;
 		const std::list<std::unique_ptr<sfl::Frame>>& sfl_frames = sfl->getSequence();
 		std::list<std::unique_ptr<sfl::Frame>>::const_iterator it = sfl_frames.begin();
-		while (vs->read())
+		while (it != sfl_frames.end() && vs->read())
 		{
 			if (!vs->isUpdated()) continue;
 

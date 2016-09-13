@@ -85,6 +85,11 @@ namespace sfl
 		*/
 		virtual float getFrameScale() const = 0;
 
+        /** Get source input path.
+        This was either loaded from file or set manually.
+        */
+        virtual const std::string& getInputPath() const = 0;
+
 		/** @brief Get the current type of tracking.
 		*/
 		virtual FaceTrackingType getTracking() const = 0;
@@ -104,6 +109,11 @@ namespace sfl
 		/** @brief Set landmarks model file.
 		*/
 		virtual void setModel(const std::string& modelPath) = 0;
+
+        /** Get source input path.
+        The input path can be then saved and loaded from file.
+        */
+        virtual void setInputPath(const std::string& inputPath) = 0;
 
 		/** @brief Set tracking type [TRACKING_NONE | TRACKING_BRISK | TRACKING_LBP].
 			This will keep the face ids consistent in the sequence.
