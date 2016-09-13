@@ -93,11 +93,14 @@ if(BUILD_CACHE_FACE_LANDMARKS)
 endif()
 
 # face_landmarks_viewer
-if(BUILD_SFL_TRACK)
-	add_subdirectory(sfl_track)
+if(BUILD_FACE_LANDMARKS_VIEWER)
+	add_subdirectory(face_landmarks_viewer)
 endif()
 
 # sfl_track
+if(BUILD_SFL_TRACK)
+	add_subdirectory(sfl_track)
+endif()
 
 if(BUILD_DOCS)
 	add_subdirectory(doc)

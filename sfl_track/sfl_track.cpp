@@ -81,8 +81,15 @@ int main(int argc, char* argv[])
         // Initialize tracker
         std::shared_ptr<sfl::FaceTracker> ft;
         if (track == 1)
+        {
+            cout << "Using BRISK face tracker." << endl;
             ft = sfl::createFaceTrackerBRISK();
-        else ft = sfl::createFaceTrackerLBP();
+        } 
+        else
+        {
+            cout << "Using LBP face tracker." << endl;
+            ft = sfl::createFaceTrackerLBP();
+        }
 
 		// Create video source
 		vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
@@ -126,7 +133,7 @@ int main(int argc, char* argv[])
                 // Show frame
                 cv::imshow("frame", frame);
                 int key = cv::waitKey(30);
-                if (key >= 0) break;
+                if (key >= 0) exit(0);
             }
         }
 

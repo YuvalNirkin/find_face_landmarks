@@ -19,7 +19,7 @@ namespace sfl
 {
 #ifdef WITH_OPENCV_CONTRIB
 
-    struct TrackedFace
+    struct TrackedFaceLBP
     {
         int id;
         int frame_id;
@@ -48,11 +48,11 @@ namespace sfl
         {
             // Deep copy tracked faces
             for (auto& face : ft.m_tracked_faces)
-                m_tracked_faces.push_back(std::make_unique<TrackedFace>(*face));
+                m_tracked_faces.push_back(std::make_unique<TrackedFaceLBP>(*face));
 
             // Deep copy lost faces
             for (auto& face : ft.m_lost_faces)
-                m_lost_faces.push_back(std::make_unique<TrackedFace>(*face));
+                m_lost_faces.push_back(std::make_unique<TrackedFaceLBP>(*face));
         }
 
         ~FaceTrackerLBP()
@@ -181,13 +181,13 @@ namespace sfl
             }
         }
 
-        std::unique_ptr<TrackedFace> createTrackedFace(
+        std::unique_ptr<TrackedFaceLBP> createTrackedFace(
             const CandidateFace& candidate, int frame_id)
         {
             if (m_verbose)
                 std::cout << "Adding new tracked face with id " << m_id_counter << std::endl;
 
-            std::unique_ptr<TrackedFace> tracked_face = std::make_unique<TrackedFace>();
+            std::unique_ptr<TrackedFaceLBP> tracked_face = std::make_unique<TrackedFaceLBP>();
             tracked_face->id = m_id_counter++;
             tracked_face->frame_id = frame_id;
             tracked_face->model = cv::face::createLBPHFaceRecognizer(3, 8, 8, 8);
@@ -202,7 +202,7 @@ namespace sfl
             return tracked_face;
         }
 
-        double calc_dist(const TrackedFace& face, const CandidateFace& candidate) const
+        double calc_dist(const TrackedFaceLBP& face, const CandidateFace& candidate) const
         {
             int label;
             double dist, similarity_dist, spatial_dist;
@@ -214,7 +214,7 @@ namespace sfl
             return dist;
         }
 
-        cv::Mat calc_dist(const std::list<std::unique_ptr<TrackedFace>>& faces,
+        cv::Mat calc_dist(const std::list<std::unique_ptr<TrackedFaceLBP>>& faces,
             const std::vector<CandidateFace>& candidates,
             std::set<size_t>& cand_indices) const
         {
@@ -246,7 +246,7 @@ namespace sfl
             return dists;
         }
 
-        void match(const std::list<std::unique_ptr<TrackedFace>>& faces,
+        void match(const std::list<std::unique_ptr<TrackedFaceLBP>>& faces,
             const std::vector<CandidateFace>& candidates, std::set<size_t>& cand_indices,
             std::vector<Face*>& sfl_faces, int frame_id)
         {
@@ -272,7 +272,7 @@ namespace sfl
             {return dists_data[i1] < dists_data[i2]; });
 
             // Create tracked faces vector
-            std::vector<TrackedFace*> tracked_faces;
+            std::vector<TrackedFaceLBP*> tracked_faces;
             tracked_faces.reserve(faces.size());
             for (auto& tracked_face : faces)
                 tracked_faces.push_back(tracked_face.get());
@@ -293,7 +293,7 @@ namespace sfl
                 // Match found
                 tracked_indices.erase(tracked_it);
                 cand_indices.erase(cand_it);
-                TrackedFace* tracked_face = tracked_faces[tracked_ind];
+                TrackedFaceLBP* tracked_face = tracked_faces[tracked_ind];
                 tracked_face->frame_id = frame_id;
                 //tracked_face->model->clear();
                 std::vector<cv::Mat> train_frames = { candidates[cand_ind].frame };
@@ -310,8 +310,8 @@ namespace sfl
         int m_id_counter = 0;
         int m_tracking_lost_range = 10;
         bool m_verbose = false;
-        std::list<std::unique_ptr<TrackedFace>> m_tracked_faces;
-        std::list<std::unique_ptr<TrackedFace>> m_lost_faces;
+        std::list<std::unique_ptr<TrackedFaceLBP>> m_tracked_faces;
+        std::list<std::unique_ptr<TrackedFaceLBP>> m_lost_faces;
     };
 
     std::shared_ptr<FaceTracker> createFaceTrackerLBP()

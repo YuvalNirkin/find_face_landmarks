@@ -12,7 +12,7 @@ using std::runtime_error;
 
 namespace sfl
 {
-	struct TrackedFace
+	struct TrackedFaceBRISK
 	{
 		int id;
 		int frame_id;
@@ -29,7 +29,7 @@ namespace sfl
 	protected:
 		int m_id_counter = 0;
 		cv::Ptr<cv::Feature2D> m_desc_extractor;
-		std::list<std::unique_ptr<TrackedFace>> m_tracked_faces;
+		std::list<std::unique_ptr<TrackedFaceBRISK>> m_tracked_faces;
 		
 	public:
 		FaceTrackerBRISK() : m_desc_extractor(cv::BRISK::create())
@@ -41,7 +41,7 @@ namespace sfl
 		{
 			// Deep copy tracked faces
 			for (auto& face : ft.m_tracked_faces)
-				m_tracked_faces.push_back(std::make_unique<TrackedFace>(*face));
+				m_tracked_faces.push_back(std::make_unique<TrackedFaceBRISK>(*face));
 		}
 
 		void addFrame(const cv::Mat& frame, Frame& sfl_frame)
@@ -53,7 +53,7 @@ namespace sfl
 			else frame_gray = frame;
 
 			// Initialize candidate list
-			std::list<std::unique_ptr<TrackedFace>> candidates;
+			std::list<std::unique_ptr<TrackedFaceBRISK>> candidates;
 			for (auto& face : sfl_frame.faces)
 				candidates.push_back(createTrackedFace(frame_gray, *face, sfl_frame.id));
 
@@ -61,11 +61,11 @@ namespace sfl
 			double dist, similarity_dist, spatial_dist;
 			cv::Mat_<double> distances(m_tracked_faces.size(), candidates.size());
 			double* distances_data = (double*)distances.data;
-			std::list<std::unique_ptr<TrackedFace>>::iterator best_candidate;
+			std::list<std::unique_ptr<TrackedFaceBRISK>>::iterator best_candidate;
 			for (auto& tracked_face : m_tracked_faces)
 			{
 				// For each candidate face
-				std::list<std::unique_ptr<TrackedFace>>::iterator it;
+				std::list<std::unique_ptr<TrackedFaceBRISK>>::iterator it;
 				for (it = candidates.begin(); it != candidates.end(); ++it)
 				{
                     similarity_dist = match(tracked_face.get(), it->get());
@@ -78,13 +78,13 @@ namespace sfl
 			// Find matches
 			if (m_tracked_faces.size() > 0)
 			{
-				std::list<std::unique_ptr<TrackedFace>>::iterator tracked_it, cand_it;
-				std::list<std::unique_ptr<TrackedFace>>::iterator best_tracked_it, best_cand_it;
+				std::list<std::unique_ptr<TrackedFaceBRISK>>::iterator tracked_it, cand_it;
+				std::list<std::unique_ptr<TrackedFaceBRISK>>::iterator best_tracked_it, best_cand_it;
 				double min_dist = std::numeric_limits<double>::max();
 				const double max_dist = 250.0f;
 				int i, j, best_i, best_j;
-				std::vector<std::pair<std::list<std::unique_ptr<TrackedFace>>::iterator,
-					std::list<std::unique_ptr<TrackedFace>>::iterator>> matches;
+				std::vector<std::pair<std::list<std::unique_ptr<TrackedFaceBRISK>>::iterator,
+					std::list<std::unique_ptr<TrackedFaceBRISK>>::iterator>> matches;
 
 				while (candidates.size() > 0)
 				{
@@ -135,7 +135,7 @@ namespace sfl
 			}
 
 			// Add unmatched candidates to tracked faces list
-			std::list<std::unique_ptr<TrackedFace>>::iterator it;
+			std::list<std::unique_ptr<TrackedFaceBRISK>>::iterator it;
 			for (it = candidates.begin(); it != candidates.end(); ++it)
 			{
 				// Output new id and add the candidate to the tracked faces list
@@ -157,10 +157,10 @@ namespace sfl
 		}
 
 	private:	
-		std::unique_ptr<TrackedFace> createTrackedFace(const cv::Mat& frame_gray,
+		std::unique_ptr<TrackedFaceBRISK> createTrackedFace(const cv::Mat& frame_gray,
 			sfl::Face& face, int _frame_id)
 		{
-			std::unique_ptr<TrackedFace> tracked_face = std::make_unique<TrackedFace>();
+			std::unique_ptr<TrackedFaceBRISK> tracked_face = std::make_unique<TrackedFaceBRISK>();
 			tracked_face->id = face.id;
 			tracked_face->frame_id = _frame_id;
 			tracked_face->bbox = face.bbox;
@@ -212,7 +212,7 @@ namespace sfl
 			return tracked_face;
 		}
 
-		double match(TrackedFace* face1, TrackedFace* face2)
+		double match(TrackedFaceBRISK* face1, TrackedFaceBRISK* face2)
 		{
 			double dist, avg_dist = 0;
 			int di, dj, total = 0;
