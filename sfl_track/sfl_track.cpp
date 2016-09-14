@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
                     cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
 
                 // Show frame
-                cv::imshow("frame", frame);
+                cv::imshow("sfl_track", frame);
                 int key = cv::waitKey(30);
                 if (key >= 0) exit(0);
             }

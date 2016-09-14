@@ -1,6 +1,6 @@
-function cache_face_landmarks(varargin)
-%CACHE_FACE_LANDMARKS Cache face landmarks for multiple executions
-%   CACHE_FACE_LANDMARKS(input, landmarks, 'output', output,
+function sfl_cache(varargin)
+%SFL_CACHE Cache face landmarks for multiple executions
+%   SFL_CACHE(input, landmarks, 'output', output,
 %   'scale', scale, 'track', track, 'preview', preview):
 %   input - Path to an image, a video file, a directory containing a
 %       sequence of images, or a posix regular expression
@@ -29,8 +29,7 @@ for i = 1:length(p.Results.scales)
 end
 
 %% Execute cache face landmarks
-exeName = 'cache_face_landmarks';
-[status, cmdout] = system([exeName ' "' p.Results.input...
+[status, cmdout] = system([mfilename ' "' p.Results.input...
     '" -o "' p.Results.output '" -l "' p.Results.landmarks...
     '" -t ' num2str(p.Results.track)...
     ' -p ' num2str(p.Results.preview)...

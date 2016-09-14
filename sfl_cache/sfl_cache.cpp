@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 			("landmarks,l", value<string>(&landmarksModelPath)->required(), "path to landmarks model file")
 			("scales,s", value<std::vector<float>>(&frame_scales)->default_value({ 1.0f }, "{1}"),
 				"frame scales for finding small faces. Best scale will be selected")
-			("track,t", value<unsigned int>(&track)->default_value(0), 
+			("track,t", value<unsigned int>(&track)->default_value(1), 
                 "track faces across frames [0=NONE|1=BRISK|2=LBP]")
 			("preview,p", value<bool>(&preview)->default_value(true), "preview landmarks")
 			;
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 						cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
 
 					// Show frame
-					cv::imshow("cache_face_landmarks", frame);
+					cv::imshow("sfl_cache", frame);
 					int key = cv::waitKey(1);
 					if (key >= 0) break;
 				}
@@ -144,9 +144,9 @@ int main(int argc, char* argv[])
 			// Set output path
 			path input = path(inputPath);
 			if (outputPath.empty()) outputPath =
-				(input.parent_path() / (input.stem() += "_landmarks.pb")).string();
-			else if (is_directory(outputPath))	outputPath =
-				(path(outputPath) / (input.stem() += "_landmarks.pb")).string();
+				(input.parent_path() / (input.stem() += ".lms")).string();
+			else if (is_directory(outputPath)) outputPath =
+				(path(outputPath) / (input.stem() += ".lms")).string();
 
 			// Saving to file
 			cout << "Best scale: " << (boost::format("%.1f") % best_sfl->getFrameScale()).str() << endl;

@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
 				cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
 			
 			// Show frame
-			cv::imshow("face_landmarks_viewer", frame);
+			cv::imshow("sfl_viewer", frame);
 			int key = cv::waitKey(45);
 			if (key >= 0) break;
 		}

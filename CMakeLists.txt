@@ -6,6 +6,9 @@ set(FFL_MAJOR_VERSION 1)
 set(FFL_MINOR_VERSION 0)
 set(FIND_FACE_LANDMARKS_VERSION ${FFL_MAJOR_VERSION}.${FFL_MINOR_VERSION})
 
+# Includes
+include(CheckIncludeFileCXX)
+
 # Global configurations
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 if(UNIX)
@@ -14,7 +17,7 @@ else()
 	 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX")
 endif()
 
-include(CheckIncludeFileCXX)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Optional 3rd party components
 # ===================================================
@@ -24,7 +27,7 @@ option(WITH_OPENCV_CONTRIB "OpenCV's extra modules" ON)
 
 # Build components
 # ===================================================
-option(BUILD_CACHE_FACE_LANDMARKS "Build cache_face_landmarks application" ON)
+option(BUILD_SFL_CACHE "Build sfl_cache application" ON)
 option(BUILD_SFL_VIEWER "Build sfl_viewer application" ON)
 option(BUILD_SFL_TRACK "Build sfl_track application" ON)
 option(BUILD_DOCS "Build documentation using Doxygen" ON)
@@ -88,8 +91,8 @@ add_subdirectory(sequence_face_landmarks)
 set(FFL_TARGETS sequence_face_landmarks)
 
 # cache_face_landmarks
-if(BUILD_CACHE_FACE_LANDMARKS)
-	add_subdirectory(cache_face_landmarks)
+if(BUILD_SFL_CACHE)
+	add_subdirectory(sfl_cache)
 endif()
 
 # face_landmarks_viewer
