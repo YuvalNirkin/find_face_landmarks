@@ -18,14 +18,15 @@ This library is released as part of the face frontalization project:
 http://www.openu.ac.il/home/hassner/projects/frontalize
 
 ## Dependencies
-| Library                                             | Minimum Version | Notes                                    |
-|-----------------------------------------------------|-----------------|------------------------------------------|
-| [Boost](http://www.boost.org/)                      | 1.47            |                                          |
-| [OpenCV](http://opencv.org/)                        | 3.0             |                                          |
-| [dlib](http://dlib.net/)                            | 18.18           |                                          |
-| [vsal](https://github.com/YuvalNirkin/vsal)         | 1.0             |                                          |
-| [protobuf](https://github.com/google/protobuf)      | 3.0.0           | Optional - For loading and saving        |
-| [Matlab](http://www.mathworks.com/products/matlab/) | 2012a           | Optional - For building the MEX function |
+| Library                                                            | Minimum Version | Notes                                    |
+|--------------------------------------------------------------------|-----------------|------------------------------------------|
+| [Boost](http://www.boost.org/)                                     | 1.47            |                                          |
+| [OpenCV](http://opencv.org/)                                       | 3.0             |                                          |
+| [dlib](http://dlib.net/)                                           | 18.18           |                                          |
+| [vsal](https://github.com/YuvalNirkin/vsal)                        | 1.0             |                                          |
+| [OpenCV's extra modules](https://github.com/opencv/opencv_contrib) | 3.0             | Optional - For the LBP face tracker      |
+| [protobuf](https://github.com/google/protobuf)                     | 3.0.0           | Optional - For loading and saving        |
+| [Matlab](http://www.mathworks.com/products/matlab/)                | 2012a           | Optional - For building the MEX function |
 
 ## Installation
 - Use CMake to build and install the mex function.
