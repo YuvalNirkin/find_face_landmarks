@@ -2,7 +2,7 @@
 if(NOT PROTOBUF_FOUND)
 	message(STATUS "sequence_face_landmarks will be built without loading and saving support because protobuf is missing.")
 endif()
-if(NOT WITH_OPENCV_CONTRIB OR NOT OpenCV_FOUND)
+if(NOT WITH_OPENCV_CONTRIB OR NOT OpenCV_FOUND OR NOT OPENCV_FACE_FOUND)
 	message(STATUS "sequence_face_landmarks will be built without LBP tracker because OpenCV Contrib is missing.")
 endif()
 
@@ -15,7 +15,7 @@ if(PROTOBUF_FOUND)
 	set(SFL_SRC ${SFL_SRC} ${PROTO_SRCS} ${PROTO_HDRS} ${PROTO_FILES})
 	add_definitions(-DWITH_PROTOBUF)
 endif()
-if(WITH_OPENCV_CONTRIB AND OpenCV_FOUND)
+if(WITH_OPENCV_CONTRIB AND OpenCV_FOUND AND OPENCV_FACE_FOUND)
 	add_definitions(-DWITH_OPENCV_CONTRIB)
 endif()
 

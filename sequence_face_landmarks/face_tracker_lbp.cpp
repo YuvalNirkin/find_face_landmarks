@@ -11,7 +11,10 @@
 // OpenCV
 #include <opencv2/imgproc.hpp>
 #include <opencv2/features2d.hpp>
+
+#ifdef WITH_OPENCV_CONTRIB
 #include <opencv2/face.hpp>
+#endif
 
 using std::runtime_error;
 
