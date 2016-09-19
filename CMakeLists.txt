@@ -40,10 +40,7 @@ find_package(dlib REQUIRED)
 # OpenCV
 find_package(OpenCV REQUIRED highgui imgproc imgcodecs features2d)
 if(WITH_OPENCV_CONTRIB)
-	check_include_file_cxx(opencv2/face/facerec.hpp OPENCV_FACE_FOUND)
-	if(OPENCV_FACE_FOUND)
-		find_package(OpenCV COMPONENTS face)
-	endif()
+	find_package(OpenCV COMPONENTS face)
 endif()
 
 # Boost

@@ -325,6 +325,8 @@ namespace sfl
 #else
     std::shared_ptr<FaceTracker> createFaceTrackerLBP()
     {
+        throw std::runtime_error("LBP face tracked is not available!"
+            " Please build with OpenCV's extra modules.");
         return nullptr;
     }
 #endif
