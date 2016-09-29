@@ -35,6 +35,8 @@ option(BUILD_INTERFACE_MATLAB "Build interface for Matlab" ON)
 
 # Find dependencies
 # ===================================================
+
+# dlib
 find_package(dlib REQUIRED)
 
 # OpenCV

@@ -109,7 +109,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 			// Main loop
 			cv::Mat frame;
-			int faceCounter = 0;
+            int frameCounter = 0, faceCounter = 0;
 			while (vs->read())
 			{
 				if (!vs->isUpdated()) continue;
@@ -126,12 +126,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 					// Render landmarks
 					sfl::render(frame, landmarks_frame);
 
-					// Render overlay
-					string msg = "Faces found so far: " + std::to_string(faceCounter);
-					cv::putText(frame, msg, cv::Point(15, 15),
-						cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1, CV_AA);
-					cv::putText(frame, "press any key to stop", cv::Point(10, frame.rows - 20),
-						cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(255, 255, 255), 1, CV_AA);
+                    // Show overlay
+                    string msg = "Frame count: " + std::to_string(++frameCounter);
+                    cv::putText(frame, msg, cv::Point(15, 15),
+                        cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+                    msg = "Face count: " + std::to_string(faceCounter);
+                    cv::putText(frame, msg, cv::Point(15, 40),
+                        cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+                    cv::putText(frame, "press any key to stop", cv::Point(10, frame.rows - 20),
+                        cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
 
 					// Show frame
 					cv::imshow("find_face_landmarks", frame);
