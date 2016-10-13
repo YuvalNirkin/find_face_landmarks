@@ -6,9 +6,6 @@ set(FFL_MAJOR_VERSION 1)
 set(FFL_MINOR_VERSION 0)
 set(FIND_FACE_LANDMARKS_VERSION ${FFL_MAJOR_VERSION}.${FFL_MINOR_VERSION})
 
-# Includes
-include(CheckIncludeFileCXX)
-
 # Global configurations
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 if(UNIX)
