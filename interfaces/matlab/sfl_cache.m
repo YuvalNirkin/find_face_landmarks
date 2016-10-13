@@ -1,7 +1,7 @@
 function sfl_cache(varargin)
 %SFL_CACHE Cache face landmarks for multiple executions
 %   SFL_CACHE(input, landmarks, 'output', output,
-%   'scale', scale, 'track', track, 'preview', preview):
+%   'scales', scales, 'track', track, 'preview', preview):
 %   input - Path to an image, a video file, a directory containing a
 %       sequence of images, or a posix regular expression
 %   output - Output file path or path to an output directory
