@@ -17,23 +17,32 @@ Main features:
 This library is released as part of the face frontalization project:
 http://www.openu.ac.il/home/hassner/projects/frontalize
 
+Link for the demonstration video:
+
+[![Demonstration Video](http://img.youtube.com/vi/mTW0zIrrkEI/0.jpg)](http://www.youtube.com/watch?v=mTW0zIrrkEI)
+
+## Usage
+There are 3 ways to use the library:
+- Matlab interface. Please take a look at the [MATLAB Tutorial](https://github.com/YuvalNirkin/find_face_landmarks/wiki/MATLAB-Tutorial).
+- C++ interface. Please take a look at the doxygen generated documentation.
+- Command line tools. Use --help for more information on each tool.
+
 ## Dependencies
 | Library                                                            | Minimum Version | Notes                                    |
 |--------------------------------------------------------------------|-----------------|------------------------------------------|
 | [Boost](http://www.boost.org/)                                     | 1.47            |                                          |
 | [OpenCV](http://opencv.org/)                                       | 3.0             |                                          |
-| [dlib](http://dlib.net/)                                           | 18.18           |                                          |
+| [dlib](https://github.com/davisking/dlib) or [dlib (Windows)](https://github.com/YuvalNirkin/dlib) | 18.18 |                    |
 | [vsal](https://github.com/YuvalNirkin/vsal)                        | 1.0             |                                          |
 | [OpenCV's extra modules](https://github.com/opencv/opencv_contrib) | 3.0             | Optional - For the LBP face tracker      |
 | [protobuf](https://github.com/google/protobuf)                     | 3.0.0           | Optional - For loading and saving        |
 | [Matlab](http://www.mathworks.com/products/matlab/)                | 2012a           | Optional - For building the MEX function |
 
 ## Installation
-- Use CMake to build and install the mex function.
+1. Use CMake and your favorite compiler to build and install the library or download the available binaries from [here](https://github.com/YuvalNirkin/find_face_landmarks/releases).
 - Add find_face_landmarks/bin to path.
 - Add find_face_landmarks/interfaces/matlab to Matlab's path
 - Download the landmarks model file: [shape_predictor_68_face_landmarks.dat](http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2)
-- Use show_face_landmarks function to display the output from find_face_landmarks
 
 ## Bibliography
 If you find this code useful, please make sure to add suitable references to the original DLIB library and the frontalization paper. Bib items for both are:<br />
