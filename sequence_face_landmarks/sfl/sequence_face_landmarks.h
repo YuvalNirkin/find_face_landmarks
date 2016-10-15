@@ -126,7 +126,7 @@ namespace sfl
 
 		/** @brief Create an instance initialized with a landmarks model file.
 		@param landmarks_path Path to the landmarks model file or landmarks cache file (.pb).
-		@frame_scale Each frame will be scaled by this factor. Useful for detection of small
+		@param frame_scale Each frame will be scaled by this factor. Useful for detection of small
 		faces. The landmarks will still be in the original frame's pixel coordinates.
         @param tracking Tracking type [TRACKING_NONE | TRACKING_BRISK | TRACKING_LBP].
 		*/
@@ -135,7 +135,7 @@ namespace sfl
             FaceTrackingType tracking = TRACKING_NONE);
 
 		/** @brief Create an instance.
-		@frame_scale Each frame will be scaled by this factor. Useful for detection of small
+		@param frame_scale Each frame will be scaled by this factor. Useful for detection of small
 		faces. The landmarks will still be in the original frame's pixel coordinates.
         @param tracking Tracking type [TRACKING_NONE | TRACKING_BRISK | TRACKING_LBP].
 		*/

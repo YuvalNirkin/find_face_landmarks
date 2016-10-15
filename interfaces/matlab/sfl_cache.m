@@ -9,7 +9,7 @@ function sfl_cache(varargin)
 %   scales [=1] - Each frame will be scaled by this factor. Useful for
 %       detection of small faces. The landmarks will still be in the
 %       original frame's pixel coordinates
-%   track [=0] - Track faces across frames
+%   track [=1] - Tracker type [0=NONE|1=BRISK|2=LBP].
 %   preview [=1] - Show preview of calculated landmarks
 
 %% Parse input arguments
@@ -18,7 +18,7 @@ addRequired(p, 'input', @ischar);
 addRequired(p, 'landmarks', @ischar);
 addParameter(p, 'output', '', @ischar);
 addParameter(p, 'scales', 1, @isvector);
-addParameter(p, 'track', 0, @isscalar);
+addParameter(p, 'track', 1, @isscalar);
 addParameter(p, 'preview', 1, @isscalar);
 parse(p,varargin{:});
 

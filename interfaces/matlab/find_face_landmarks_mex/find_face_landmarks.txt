@@ -7,7 +7,7 @@
 %       scale [=1] - Each frame will be scaled by this factor. Useful for
 %       detection of small faces. The landmarks will still be in the
 %       original frame's pixel coordinates
-%       track [=1] - Track faces across frames
+%       track [=1] - Tracker type [0=NONE|1=BRISK|2=LBP].
 %       preview [=1] - Show preview of calculated landmarks
 %   Output:
 %       frames - An array of frames, each frame contains the width and

@@ -15,8 +15,8 @@ namespace sfl
 	@param landmarks The landmark points to render.
 	@param drawLabels if true, for each landmark, it's 0 based index will be
 	rendererd as a label.
-	@param color Line\point and label color.
-	@param thickness Line\point thickness.
+	@param color Line/point and label color.
+	@param thickness Line/point thickness.
 	*/
 	void render(cv::Mat& img, const std::vector<cv::Point>& landmarks,
 		bool drawLabels = false, const cv::Scalar& color = cv::Scalar(0, 255, 0),
@@ -37,8 +37,9 @@ namespace sfl
 	@param drawLabels if true, for each landmark, it's 0 based index will be
 	rendererd as a label.
 	@param bbox_color Bounding box line color.
-	@param landmarks_color Landmarks line\point and label color.
-	@param thickness Line\point thickness.
+	@param landmarks_color Landmarks line/point and label color.
+	@param thickness Line/point thickness.
+    @param fontScale The size of the font for the labels.
 	*/
 	void render(cv::Mat& img, const Face& face, bool drawLabels = false,
 		const cv::Scalar& bbox_color = cv::Scalar(0, 0, 255),
@@ -51,8 +52,9 @@ namespace sfl
 	@param drawLabels if true, for each landmark, it's 0 based index will be
 	rendererd as a label.
 	@param bbox_color Bounding box line color.
-	@param landmarks_color Landmarks line\point and label color.
-	@param thickness Line\point thickness.
+	@param landmarks_color Landmarks line/point and label color.
+	@param thickness Line/point thickness.
+    @param fontScale The size of the font for the labels.
 	*/
 	void render(cv::Mat& img, const Frame& frame, bool drawLabels = false,
 		const cv::Scalar& bbox_color = cv::Scalar(0, 0, 255),

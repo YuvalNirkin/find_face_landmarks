@@ -59,9 +59,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			inputPath = MxArray(prhs[0]).toString();
 
 			path input = path(inputPath);
-			if (input.extension() == ".pb") landmarksPath = inputPath;
+			if (input.extension() == ".lms") landmarksPath = inputPath;
 			else landmarksPath =
-				(input.parent_path() / (input.stem() += "_landmarks.pb")).string();
+				(input.parent_path() / (input.stem() += ".lms")).string();
 			if (!is_regular_file(landmarksPath))
 				throw runtime_error("Couldn't find landmarks file!");
 		}
@@ -76,7 +76,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			// Check for landmarks file
 			path input = path(inputPath);
 			landmarksPath =
-				(input.parent_path() / (input.stem() += "_landmarks.pb")).string();
+				(input.parent_path() / (input.stem() += ".lms")).string();
 			if (is_regular_file(landmarksPath)) landmarksModelPath.clear();
 			else landmarksPath.clear();
 		}
