@@ -21,6 +21,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 option(WITH_VSAL "Video Stream Abstraction Layer" ON)
 option(WITH_PROTOBUF "Protocol Buffers - Google's data interchange format" ON)
 option(WITH_OPENCV_CONTRIB "OpenCV's extra modules" ON)
+option(WITH_QT "Qt" ON)
 
 # Build components
 # ===================================================
@@ -57,6 +58,11 @@ endif()
 # protobuf
 if(WITH_PROTOBUF)
 	find_package(protobuf)
+endif()
+
+# Qt
+if(WITH_QT)
+	find_package(Qt5Widgets)
 endif()
 
 # Docs

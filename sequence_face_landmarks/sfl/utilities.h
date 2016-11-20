@@ -34,6 +34,7 @@ namespace sfl
 	/** @brief Render face's bounding box and landmarks.
 	@param img The image that the face will be rendered on.
 	@param face The face to render.
+    @param drawIDs if true, the 0 based id will be rendererd as a label.
 	@param drawLabels if true, for each landmark, it's 0 based index will be
 	rendererd as a label.
 	@param bbox_color Bounding box line color.
@@ -41,14 +42,15 @@ namespace sfl
 	@param thickness Line/point thickness.
     @param fontScale The size of the font for the labels.
 	*/
-	void render(cv::Mat& img, const Face& face, bool drawLabels = false,
-		const cv::Scalar& bbox_color = cv::Scalar(0, 0, 255),
+	void render(cv::Mat& img, const Face& face, bool drawIDs = true,
+        bool drawLabels = false, const cv::Scalar& bbox_color = cv::Scalar(0, 0, 255),
 		const cv::Scalar& landmarks_color = cv::Scalar(0, 255, 0), int thickness = 1,
 		double fontScale = 1.0);
 
 	/** @brief Render all frame faces including bounding boxs and landmarks.
 	@param img The image that the faces will be rendered on.
 	@param frame The frame to render.
+    @param drawIDs if true, the 0 based id will be rendererd as a label.
 	@param drawLabels if true, for each landmark, it's 0 based index will be
 	rendererd as a label.
 	@param bbox_color Bounding box line color.
@@ -56,10 +58,13 @@ namespace sfl
 	@param thickness Line/point thickness.
     @param fontScale The size of the font for the labels.
 	*/
-	void render(cv::Mat& img, const Frame& frame, bool drawLabels = false,
-		const cv::Scalar& bbox_color = cv::Scalar(0, 0, 255),
+	void render(cv::Mat& img, const Frame& frame, bool drawIDs = true,
+        bool drawLabels = false, const cv::Scalar& bbox_color = cv::Scalar(0, 0, 255),
 		const cv::Scalar& landmarks_color = cv::Scalar(0, 255, 0), int thickness = 1,
 		double fontScale = 1.0);
+
+    void renderFaceID(cv::Mat& img, const Face& face, const cv::Scalar& color, int thickness = 1,
+        double fontScale = 1.0);
 
 
 	/** @brief Represents a face statistics in the sequence.

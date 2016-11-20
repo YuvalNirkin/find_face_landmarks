@@ -70,7 +70,7 @@ namespace sfl
 		cv::rectangle(img, bbox, color, thickness);
 	}
 
-	void render(cv::Mat& img, const Face& face, bool drawLabels,
+	void render(cv::Mat& img, const Face& face, bool drawIDs, bool drawLabels,
 		const cv::Scalar& bbox_color, const cv::Scalar& landmarks_color, int thickness,
 		double fontScale)
 	{
@@ -78,24 +78,30 @@ namespace sfl
 		render(img, face.landmarks, drawLabels, landmarks_color, thickness);
 
 		// Add face id label
-		std::string lbl = std::to_string(face.id);
-		int baseline = 0;
-		cv::Size textSize = cv::getTextSize(lbl, cv::FONT_HERSHEY_PLAIN,
-			fontScale, thickness, &baseline);
-		cv::Point lbl_pt(face.bbox.x + (face.bbox.width - textSize.width) / 2, 
-			face.bbox.y - textSize.height / 4);
-		cv::putText(img, std::to_string(face.id), lbl_pt,
-			cv::FONT_HERSHEY_PLAIN, fontScale, bbox_color, thickness);
+        if (drawIDs) renderFaceID(img, face, bbox_color, thickness, fontScale);
 	}
 
-	void render(cv::Mat& img, const Frame& frame, bool drawLabels,
+	void render(cv::Mat& img, const Frame& frame, bool drawIDs, bool drawLabels,
 		const cv::Scalar& bbox_color, const cv::Scalar& landmarks_color, int thickness,
 		double fontScale)
 	{
 		for (auto& face : frame.faces)
-			render(img, *face, drawLabels, bbox_color, landmarks_color, thickness,
+			render(img, *face, drawIDs, drawLabels, bbox_color, landmarks_color, thickness,
 				fontScale);
 	}
+
+    void renderFaceID(cv::Mat& img, const Face& face, const cv::Scalar& color,
+        int thickness, double fontScale)
+    {
+        std::string lbl = std::to_string(face.id);
+        int baseline = 0;
+        cv::Size textSize = cv::getTextSize(lbl, cv::FONT_HERSHEY_PLAIN,
+            fontScale, thickness, &baseline);
+        cv::Point lbl_pt(face.bbox.x + (face.bbox.width - textSize.width) / 2,
+            face.bbox.y - textSize.height / 4);
+        cv::putText(img, std::to_string(face.id), lbl_pt,
+            cv::FONT_HERSHEY_PLAIN, fontScale, color, thickness);
+    }
 
 	void getSequenceStats(const std::list<std::unique_ptr<Frame>>& sequence,
 		std::vector<FaceStat>& stats)

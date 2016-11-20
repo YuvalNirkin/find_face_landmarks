@@ -1,147 +1,227 @@
-// std
-#include <iostream>
-#include <exception>
-
-// Boost
-#include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
-
-// sfl
-#include <sfl/sequence_face_landmarks.h>
+#include "sfl_viewer.h"
+#include <vsal/VideoStreamFactory.h>
 #include <sfl/utilities.h>
 
-// vsal
-#include <vsal/VideoStreamFactory.h>
-#include <vsal/VideoStreamOpenCV.h>
+#include <exception>
+#include <iostream>//
+
+// Boost
+#include <boost/filesystem.hpp>
 
 // OpenCV
-#include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 
-using std::cout;
-using std::endl;
-using std::cerr;
-using std::string;
-using std::runtime_error;
-using namespace boost::program_options;
+// Qt
+#include <QEventTransition>
+#include <QKeyEventTransition>
+#include <QSignalTransition>
+#include <QFileDialog>
+#include <QResizeEvent>
+
+#include <QMessageBox>//
+
 using namespace boost::filesystem;
 
-
-int main(int argc, char* argv[])
+namespace sfl
 {
-	// Parse command line arguments
-    std::vector<string> inputPaths;
-    string landmarksPath, videoPath;
-	bool draw_ind;
-	try {
-		options_description desc("Allowed options");
-		desc.add_options()
-			("help", "display the help message")
-            ("input,i", value<std::vector<string>>(&inputPaths)->required(),
-                "path to video or landmarks (.lms) files")
-			("draw_ind,d", value<bool>(&draw_ind)->default_value(false)->implicit_value(true),
-				"draw landmark indices")
-			;
-		variables_map vm;
-		store(command_line_parser(argc, argv).options(desc).
-			positional(positional_options_description().add("input", -1)).run(), vm);
-		if (vm.count("help")) {
-			cout << "Usage: cache_face_landmarks [options]" << endl;
-			cout << desc << endl;
-			exit(0);
-		}
-		notify(vm);
-        if (inputPaths.size() > 2) throw error("Too many input arguments!");
-        for (string& inputPath : inputPaths)
+    Viewer::Viewer() : 
+        sm(this)
+    {
+        setupUi(this);
+        setupBl();
+    }
+
+    void Viewer::setupBl()
+    {
+        sm.initiate();
+
+        // Connect actions
+        connect(action_Open, &QAction::triggered, this, &Viewer::open);
+        connect(action_Close, &QAction::triggered, this, &Viewer::close);
+        connect(actionPlay, &QAction::triggered, this, &Viewer::playPause);
+        connect(actionBackward, &QAction::triggered, this, &Viewer::backward);
+        connect(actionForward, &QAction::triggered, this, &Viewer::forward);
+        connect(frame_slider, SIGNAL(valueChanged(int)), this, SLOT(frameSliderChanged(int)));
+        connect(actionShowLandmarks, SIGNAL(toggled(bool)), this, SLOT(toggleRenderParams(bool)));
+        connect(actionShowBBox, SIGNAL(toggled(bool)), this, SLOT(toggleRenderParams(bool)));
+        connect(actionShowIDs, SIGNAL(toggled(bool)), this, SLOT(toggleRenderParams(bool)));
+        connect(actionShowLabels, SIGNAL(toggled(bool)), this, SLOT(toggleRenderParams(bool)));
+
+        play_pause_btn->setDefaultAction(actionPlay);
+        backward_btn->setDefaultAction(actionBackward);
+        forward_btn->setDefaultAction(actionForward);
+
+        // Adjust window size
+        adjustSize();
+    }
+
+    void Viewer::setInputPath(const std::string & input_path)
+    {
+        if (path(input_path).extension() == ".lms")
+            initLandmarks(input_path);
+        else initVideoSource(input_path);
+    }
+
+    void Viewer::initLandmarks(const std::string & _landmarks_path)
+    {
+        if (!is_regular_file(_landmarks_path)) return;
+        sfl = sfl::SequenceFaceLandmarks::create(_landmarks_path);
+        landmarks_path = _landmarks_path;
+        initVideoSource(sfl->getInputPath());
+        sm.process_event(EvStart());
+    }
+
+    void Viewer::initVideoSource(const std::string & _sequence_path)
+    {
+        if (!is_regular_file(_sequence_path)) return;
+
+        vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
+        vs.reset((vsal::VideoStreamOpenCV*)vsf.create(_sequence_path));
+        if (vs != nullptr && !vs->open()) vs = nullptr;
+        else
         {
-            path input = inputPath;
-            if (input.extension() == ".pb" || input.extension() == ".lms")
-            {
-                if (landmarksPath.empty()) landmarksPath = inputPath;
-                else throw error("Too many landmarks files specified!");
-            }
-            else if (videoPath.empty()) videoPath = inputPath;
-            else throw error("Too many video paths specified!");
+            sequence_path = _sequence_path;
+            path input = path(sequence_path);
+            initLandmarks((input.parent_path() / (input.stem() += ".lms")).string());
+            sm.process_event(EvStart());
         }
-        if (!is_regular_file(landmarksPath) && is_regular_file(videoPath))
+    }
+
+    bool Viewer::event(QEvent * event)
+    {
+        switch (event->type())
         {
-            path video = path(videoPath);
-            landmarksPath =
-                (video.parent_path() / (video.stem() += ".lms")).string();
-            if (!is_regular_file(landmarksPath))
-                throw error("Couldn't find landmarks file!");
-        }
-	}
-	catch (const error& e) {
-		cout << "Error while parsing command-line arguments: " << e.what() << endl;
-		cout << "Use --help to display a list of options." << endl;
-		exit(1);
-	}
+        case QEvent::UpdateRequest:
+            update();
+            return QMainWindow::event(event);
+        default:
+            return QMainWindow::event(event);
+        };
+    }
 
-	try
-	{
-		// Initialize Sequence Face Landmarks
-		std::shared_ptr<sfl::SequenceFaceLandmarks> sfl =
-			sfl::SequenceFaceLandmarks::create(landmarksPath);
+    void Viewer::resizeEvent(QResizeEvent* event)
+    {
+        QMainWindow::resizeEvent(event);
 
-        // Validate video path
-        if (videoPath.empty())
+        QSize winSize = event->size();
+        QSize displaySize = display->size();
+
+        std::cout << "winSize = (" << winSize.width() << ", " << winSize.height() << ")" << std::endl;
+        std::cout << "displaySize = (" << displaySize.width() << ", " << displaySize.height() << ")" << std::endl;
+
+        render_frame = cv::Mat::zeros(displaySize.height(), displaySize.width(), CV_8UC3);
+
+        // Make Qt image.
+        render_image.reset(new QImage((const uint8_t*)render_frame.data,
+            render_frame.cols,
+            render_frame.rows,
+            render_frame.step[0],
+            QImage::Format_RGB888));
+
+        sm.process_event(EvUpdate());
+    }
+
+    void Viewer::timerEvent(QTimerEvent *event)
+    {
+        sm.process_event(EvTimerTick());
+    }
+
+    void Viewer::open()
+    {
+        QString file = QFileDialog::getOpenFileName(
+            this,
+            "Select one or more files to open",
+            QString(),
+            "Landmarks (*.lms);;Videos (*.mp4 *.mkv *.avi *wmv);;All files (*.*)",
+            nullptr);
+        setInputPath(file.toStdString());
+    }
+
+    void Viewer::close()
+    {
+        QMainWindow::close();
+    }
+
+    void Viewer::playPause()
+    {
+        std::cout << "play / pause" << std::endl;
+        sm.process_event(EvPlayPause());
+    }
+
+    void Viewer::backward()
+    {
+        //std::cout << "backward" << std::endl;
+        sm.process_event(EvSeek(curr_frame_pos - 1));
+    }
+
+    void Viewer::forward()
+    {
+        //std::cout << "forward" << std::endl;
+        sm.process_event(EvSeek(curr_frame_pos + 1));
+    }
+
+    void Viewer::frameSliderChanged(int i)
+    {
+        sm.process_event(EvSeek(i));
+    }
+
+    void Viewer::toggleRenderParams(bool toggled)
+    {
+        sm.process_event(EvUpdate());
+    }
+
+    void Viewer::update()
+    {
+        /*
+        std::cout << "update" << std::endl;
+        QSize displaySize = display->size();
+        std::cout << "displaySize = (" << displaySize.width() << ", " << displaySize.height() << ")" << std::endl;
+        display->setPixmap(QPixmap::fromImage(render_image->rgbSwapped()));
+        display->update();
+        */
+        //render();
+    }
+
+    void Viewer::render()
+    {
+        // Render landmarks
+        landmarks_render_frame = frame.clone();
+        //sfl::render(frame, *sfl_frames[curr_frame_pos]);
+
+        for (auto& face : sfl_frames[curr_frame_pos]->faces)
         {
-            if (!sfl->getInputPath().empty()) videoPath = sfl->getInputPath();
-            if (!is_regular_file(videoPath))
-                throw runtime_error("Couldn't find video sequence file!");
+            if (actionShowLandmarks->isChecked())
+                sfl::render(landmarks_render_frame, face->landmarks, 
+                    actionShowLabels->isChecked(), landmarks_color);
+            if (actionShowBBox->isChecked())
+                sfl::render(landmarks_render_frame, face->bbox, bbox_color);
+            if (actionShowIDs->isChecked())
+                renderFaceID(landmarks_render_frame, *face, bbox_color);
+        } 
+
+        // Resize frame
+        QSize displaySize = display->size();
+        float frame_ratio = float(frame.cols) / float(frame.rows);
+        int rh = displaySize.height();
+        int rw = (int)std::round(frame_ratio * rh);
+        if (rw > displaySize.width())
+        {
+            rw = displaySize.width();
+            rh = (int)std::round(rw / frame_ratio);
         }
-        else if (is_regular_file(videoPath)) sfl->setInputPath(videoPath);
-        else throw runtime_error("Couldn't find video sequence file!");
+        cv::resize(landmarks_render_frame, resized_frame, cv::Size(rw, rh), 0.0, 0.0, cv::INTER_CUBIC);
 
-		// Create video source
-		vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
-		std::unique_ptr<vsal::VideoStreamOpenCV> vs(
-			(vsal::VideoStreamOpenCV*)vsf.create(videoPath));
-		if (vs == nullptr) throw runtime_error("No video source specified!");
+        // Create render frame
+        int dx = (displaySize.width() - rw) / 2;
+        int dy = (displaySize.height() - rh) / 2;
+        resized_frame.copyTo(render_frame(cv::Rect(dx, dy, rw, rh)));
 
-		// Open video source
-		if (!vs->open()) throw runtime_error("Failed to open video source!");
+        // Render to display
+        display->setPixmap(QPixmap::fromImage(render_image->rgbSwapped()));
+        display->update();
+    }
 
-		// Preview loop
-		cv::Mat frame;
-		int frameCounter = 0, faceCounter = 0;
-		const std::list<std::unique_ptr<sfl::Frame>>& sfl_frames = sfl->getSequence();
-		std::list<std::unique_ptr<sfl::Frame>>::const_iterator it = sfl_frames.begin();
-		while (it != sfl_frames.end() && vs->read())
-		{
-			if (!vs->isUpdated()) continue;
 
-			frame = vs->getFrame();
-			const std::unique_ptr<sfl::Frame>& sfl_frame = *it++;
-			faceCounter += sfl_frame->faces.size();
-
-			// Render landmarks
-			sfl::render(frame, *sfl_frame, draw_ind);
-
-			// Show overlay
-			string msg = "Frame count: " + std::to_string(++frameCounter);
-			cv::putText(frame, msg, cv::Point(15, 15),
-				cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
-			msg = "Face count: " + std::to_string(faceCounter);
-			cv::putText(frame, msg, cv::Point(15, 40),
-				cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
-			cv::putText(frame, "press any key to stop", cv::Point(10, frame.rows - 20),
-				cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
-			
-			// Show frame
-			cv::imshow("sfl_viewer", frame);
-			int key = cv::waitKey(45);
-			if (key >= 0) break;
-		}
-	}
-	catch (std::exception& e)
-	{
-		cerr << e.what() << endl;
-		return 1;
-	}
-
-	return 0;
-}
+}   // namespace sfl
 
