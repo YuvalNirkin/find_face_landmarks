@@ -23,6 +23,10 @@ qt5_wrap_cpp(SFL_VIEWER_HDR_MOC ${SFL_VIEWER_HDR})
 qt5_wrap_ui(SFL_VIEWER_UI_MOC sfl_viewer.ui)
 qt5_add_resources(SFL_VIEWER_QRC sfl_viewer.qrc)
 
+if(MSVC)
+	set(SFL_VIEWER_SRC ${SFL_VIEWER_SRC} sfl_viewer.rc)
+endif()
+
 # Target
 if(WIN32)
 	link_directories(${Boost_LIBRARY_DIRS})

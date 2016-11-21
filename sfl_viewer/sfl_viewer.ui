@@ -184,7 +184,7 @@
    <addaction name="menu_View"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="toolBar">
+  <widget class="QToolBar" name="fileToolBar">
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -195,6 +195,21 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_Open"/>
+  </widget>
+  <widget class="QToolBar" name="viewToolBar">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionShowLandmarks"/>
+   <addaction name="actionShowBBox"/>
+   <addaction name="actionShowIDs"/>
+   <addaction name="actionShowLabels"/>
   </widget>
   <action name="action_Open">
    <property name="icon">
@@ -255,6 +270,9 @@
    <property name="checked">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset theme=":/images/landmarks.png"/>
+   </property>
    <property name="text">
     <string>Show Landmarks</string>
    </property>
@@ -265,6 +283,9 @@
    </property>
    <property name="checked">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset theme=":/images/bbox.png"/>
    </property>
    <property name="text">
     <string>Show Bounding Box</string>
@@ -277,6 +298,9 @@
    <property name="checked">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset theme=":/images/labels.png"/>
+   </property>
    <property name="text">
     <string>Show Labels</string>
    </property>
@@ -287,6 +311,9 @@
    </property>
    <property name="checked">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset theme=":/images/face_ids.png"/>
    </property>
    <property name="text">
     <string>Show IDs</string>
