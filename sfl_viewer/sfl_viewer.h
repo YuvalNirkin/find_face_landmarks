@@ -26,7 +26,6 @@ namespace sfl
         void initVideoSource(const std::string& _sequence_path);
 
     protected:
-        bool event(QEvent *event) Q_DECL_OVERRIDE;
         void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
         void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
 
@@ -38,7 +37,6 @@ namespace sfl
         void forward();
         void frameSliderChanged(int i);
         void toggleRenderParams(bool toggled);
-        void update();
         void render();
 
     public:
@@ -53,6 +51,7 @@ namespace sfl
         std::unique_ptr<QImage> render_image;
         int curr_frame_pos = 0;
         int total_frames = 0;
+        double fps = 0.0;
 
         // sfl
         std::shared_ptr<sfl::SequenceFaceLandmarks> sfl;
@@ -62,10 +61,7 @@ namespace sfl
 
         int timer_id = 0;
     };
+
 }   // namespace sfl
-
-
-
-
 
 #endif // __SFL_VIEWER_H__

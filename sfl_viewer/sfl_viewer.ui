@@ -276,6 +276,9 @@
    <property name="text">
     <string>Show Landmarks</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
   </action>
   <action name="actionShowBBox">
    <property name="checkable">
@@ -289,6 +292,9 @@
    </property>
    <property name="text">
     <string>Show Bounding Box</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
    </property>
   </action>
   <action name="actionShowLabels">
@@ -304,6 +310,9 @@
    <property name="text">
     <string>Show Labels</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
   </action>
   <action name="actionShowIDs">
    <property name="checkable">
@@ -317,6 +326,9 @@
    </property>
    <property name="text">
     <string>Show IDs</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
  </widget>

@@ -4,7 +4,6 @@
 // Boost
 #include <boost/statechart/event.hpp>
 #include <boost/statechart/state_machine.hpp>
-//#include <boost/statechart/simple_state.hpp>
 #include <boost/statechart/state.hpp>
 #include <boost/statechart/in_state_reaction.hpp>
 #include <boost/statechart/transition.hpp>
@@ -52,7 +51,6 @@ namespace sfl
     struct Inactive : sc::state<Inactive, ViewerSM>
     {
         Inactive(my_context ctx);
-        ~Inactive();
 
         void onUpdate(const EvUpdate& event);
         sc::result react(const EvStart&);
@@ -69,9 +67,11 @@ namespace sfl
         Active(my_context ctx);
 
         void onSeek(const EvSeek& event);
+        void onStart(const EvStart& event);
 
         typedef mpl::list<
             sc::in_state_reaction<EvSeek, Active, (void(Active::*)(const EvSeek&))(&Active::onSeek)>,
+            sc::in_state_reaction<EvStart, Active, (void(Active::*)(const EvStart&))(&Active::onStart)>,
             sc::transition< EvReset, Inactive > > reactions;
 
         Viewer* viewer;

@@ -34,7 +34,7 @@ else()
 	link_libraries(${Boost_LIBRARIES})
 endif()
 
-add_executable(sfl_viewer ${SFL_VIEWER_SRC} ${SFL_VIEWER_HDR}
+add_executable(sfl_viewer WIN32 ${SFL_VIEWER_SRC} ${SFL_VIEWER_HDR}
 	${SFL_VIEWER_HDR_MOC} ${SFL_VIEWER_UI_MOC} ${SFL_VIEWER_QRC})
 target_include_directories(sfl_viewer PRIVATE 
 	${CMAKE_SOURCE_DIR}/sequence_face_landmarks

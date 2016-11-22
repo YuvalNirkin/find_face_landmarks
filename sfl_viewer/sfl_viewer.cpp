@@ -18,7 +18,6 @@
 #include <QSignalTransition>
 #include <QFileDialog>
 #include <QResizeEvent>
-
 #include <QMessageBox>//
 
 using namespace boost::filesystem;
@@ -34,6 +33,7 @@ namespace sfl
 
     void Viewer::setupBl()
     {
+        // Initialize state machine
         sm.initiate();
 
         // Connect actions
@@ -88,28 +88,11 @@ namespace sfl
         }
     }
 
-    bool Viewer::event(QEvent * event)
-    {
-        switch (event->type())
-        {
-        case QEvent::UpdateRequest:
-            update();
-            return QMainWindow::event(event);
-        default:
-            return QMainWindow::event(event);
-        };
-    }
-
     void Viewer::resizeEvent(QResizeEvent* event)
     {
         QMainWindow::resizeEvent(event);
 
-        QSize winSize = event->size();
         QSize displaySize = display->size();
-
-        std::cout << "winSize = (" << winSize.width() << ", " << winSize.height() << ")" << std::endl;
-        std::cout << "displaySize = (" << displaySize.width() << ", " << displaySize.height() << ")" << std::endl;
-
         render_frame = cv::Mat::zeros(displaySize.height(), displaySize.width(), CV_8UC3);
 
         // Make Qt image.
@@ -145,19 +128,16 @@ namespace sfl
 
     void Viewer::playPause()
     {
-        std::cout << "play / pause" << std::endl;
         sm.process_event(EvPlayPause());
     }
 
     void Viewer::backward()
     {
-        //std::cout << "backward" << std::endl;
         sm.process_event(EvSeek(curr_frame_pos - 1));
     }
 
     void Viewer::forward()
     {
-        //std::cout << "forward" << std::endl;
         sm.process_event(EvSeek(curr_frame_pos + 1));
     }
 
@@ -171,23 +151,10 @@ namespace sfl
         sm.process_event(EvUpdate());
     }
 
-    void Viewer::update()
-    {
-        /*
-        std::cout << "update" << std::endl;
-        QSize displaySize = display->size();
-        std::cout << "displaySize = (" << displaySize.width() << ", " << displaySize.height() << ")" << std::endl;
-        display->setPixmap(QPixmap::fromImage(render_image->rgbSwapped()));
-        display->update();
-        */
-        //render();
-    }
-
     void Viewer::render()
     {
         // Render landmarks
         landmarks_render_frame = frame.clone();
-        //sfl::render(frame, *sfl_frames[curr_frame_pos]);
 
         for (auto& face : sfl_frames[curr_frame_pos]->faces)
         {
@@ -202,26 +169,29 @@ namespace sfl
 
         // Resize frame
         QSize displaySize = display->size();
-        float frame_ratio = float(frame.cols) / float(frame.rows);
-        int rh = displaySize.height();
-        int rw = (int)std::round(frame_ratio * rh);
-        if (rw > displaySize.width())
+        if (displaySize.width() != frame.cols || displaySize.height() != frame.rows)
         {
-            rw = displaySize.width();
-            rh = (int)std::round(rw / frame_ratio);
+            float frame_ratio = float(frame.cols) / float(frame.rows);
+            int rh = displaySize.height();
+            int rw = (int)std::round(frame_ratio * rh);
+            if (rw > displaySize.width())
+            {
+                rw = displaySize.width();
+                rh = (int)std::round(rw / frame_ratio);
+            }
+            cv::resize(landmarks_render_frame, resized_frame, cv::Size(rw, rh), 0.0, 0.0, cv::INTER_CUBIC);
         }
-        cv::resize(landmarks_render_frame, resized_frame, cv::Size(rw, rh), 0.0, 0.0, cv::INTER_CUBIC);
+        else resized_frame = landmarks_render_frame;
 
         // Create render frame
-        int dx = (displaySize.width() - rw) / 2;
-        int dy = (displaySize.height() - rh) / 2;
-        resized_frame.copyTo(render_frame(cv::Rect(dx, dy, rw, rh)));
+        int dx = (displaySize.width() - resized_frame.cols) / 2;
+        int dy = (displaySize.height() - resized_frame.rows) / 2;
+        resized_frame.copyTo(render_frame(cv::Rect(dx, dy, resized_frame.cols, resized_frame.rows)));
 
         // Render to display
         display->setPixmap(QPixmap::fromImage(render_image->rgbSwapped()));
         display->update();
     }
-
 
 }   // namespace sfl
 
