@@ -152,6 +152,7 @@ int main(int argc, char* argv[])
 			cout << "Best scale: " << (boost::format("%.1f") % best_sfl->getFrameScale()).str() << endl;
 			cout << "Total faces found: " + std::to_string(max_faces) << endl;
 			cout << "Saving landmarks to \"" << outputPath << "\"." << endl;
+            best_sfl->setInputPath(inputPath);
 			best_sfl->save(outputPath);
 		}
 	}
