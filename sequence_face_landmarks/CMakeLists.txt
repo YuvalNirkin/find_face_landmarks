@@ -20,16 +20,22 @@ if(WITH_OPENCV_CONTRIB AND TARGET opencv_face)
 endif()
 
 # Target
-if(WIN32)
-	link_directories(${Boost_LIBRARY_DIRS})
-else()
-	link_libraries(${Boost_LIBRARIES})
-endif()
+#if(WIN32)
+#	link_directories(${Boost_LIBRARY_DIRS})
+#else()
+#	link_libraries(${Boost_LIBRARIES})
+#endif()
 add_library(sequence_face_landmarks ${SFL_SRC} ${SFL_INCLUDE})
 target_include_directories(sequence_face_landmarks PUBLIC 
-	${Boost_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${dlib_INCLUDE_DIRS})
+	${Boost_INCLUDE_DIRS}
+	${OpenCV_INCLUDE_DIRS}
+	${dlib_INCLUDE_DIRS}
+)
 target_link_libraries(sequence_face_landmarks PUBLIC 
-	${OpenCV_LIBS} ${dlib_LIBRARIES})
+	${Boost_LIBRARIES}
+	${OpenCV_LIBS}
+	${dlib_LIBRARIES}
+)
 if(PROTOBUF_FOUND)
 	target_include_directories(sequence_face_landmarks PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 	target_include_directories(sequence_face_landmarks PUBLIC ${PROTOBUF_INCLUDE_DIRS})
