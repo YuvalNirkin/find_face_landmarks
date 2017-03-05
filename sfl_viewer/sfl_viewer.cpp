@@ -66,6 +66,8 @@ namespace sfl
     void Viewer::initLandmarks(const std::string & _landmarks_path)
     {
         if (!is_regular_file(_landmarks_path)) return;
+        if (landmarks_path == _landmarks_path) return;
+
         sfl = sfl::SequenceFaceLandmarks::create(_landmarks_path);
         landmarks_path = _landmarks_path;
         initVideoSource(sfl->getInputPath());
@@ -75,6 +77,7 @@ namespace sfl
     void Viewer::initVideoSource(const std::string & _sequence_path)
     {
         if (!is_regular_file(_sequence_path)) return;
+        if (sequence_path == _sequence_path) return;
 
         vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
         vs.reset((vsal::VideoStreamOpenCV*)vsf.create(_sequence_path));
