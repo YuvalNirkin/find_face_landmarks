@@ -39,7 +39,7 @@ There are 3 ways to use the library:
 | [Matlab](http://www.mathworks.com/products/matlab/)                | 2012a           | Optional - For building the MEX function |
 
 ## Installation
-1. Use CMake and your favorite compiler to build and install the library or download the available binaries from [here](https://github.com/YuvalNirkin/find_face_landmarks/releases).
+- Use CMake and your favorite compiler to build and install the library or download the available binaries from [here](https://github.com/YuvalNirkin/find_face_landmarks/releases).
 - Add find_face_landmarks/bin to path.
 - Add find_face_landmarks/interfaces/matlab to Matlab's path
 - Download the landmarks model file: [shape_predictor_68_face_landmarks.dat](http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2)
