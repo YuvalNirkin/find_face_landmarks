@@ -1,4 +1,6 @@
-# find_face_landmarks
+# Find Face Landmarks
+![alt text](https://3.bp.blogspot.com/-bk69Sd5LTHk/V25XMfVMY1I/AAAAAAAAC9A/jiP6e5geTUQxAo8WCp36Z3L3CqlWqzbxgCLcB/s400/076_small_landmarks.PNG "Demonstration")
+
 Created by Yuval Nirkin.
 
 [nirkin.com](http://www.nirkin.com/)
@@ -6,20 +8,21 @@ Created by Yuval Nirkin.
 ## Overview
 This library provides video\image sequence functionality for finding face landmarks and bounding boxes.
 
-![alt text](https://3.bp.blogspot.com/-bk69Sd5LTHk/V25XMfVMY1I/AAAAAAAAC9A/jiP6e5geTUQxAo8WCp36Z3L3CqlWqzbxgCLcB/s400/076_small_landmarks.PNG "Demonstration")
-
 Main features:
 - Matlab interface.
 - Saving and loading per sequence.
 - Face tracking across frames in a sequence.
 - Face statistics for finding the most dominant face.
 
-This library is released as part of the face frontalization project:
-http://www.openu.ac.il/home/hassner/projects/frontalize
-
 Link for the demonstration video:
 
 [![Demonstration Video](http://img.youtube.com/vi/mTW0zIrrkEI/0.jpg)](http://www.youtube.com/watch?v=mTW0zIrrkEI)
+
+If you find this code useful, please make sure to cite our paper in your work:
+
+Yuval Nirkin, Iacopo Masi, Anh Tuan Tran, Tal Hassner, Gerard Medioni, "[On Face Segmentation, Face Swapping, and Face Perception](https://arxiv.org/pdf/1704.06729.pdf)", arXiv preprint.
+
+Please see [project page](http://www.openu.ac.il/home/hassner/projects/faceswap/) for more details, more resources and updates on this project.
 
 ## Usage
 There are 3 ways to use the library:
@@ -45,25 +48,5 @@ There are 3 ways to use the library:
 - Download the landmarks model file: [shape_predictor_68_face_landmarks.dat](http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2)
 
 ## Bibliography
-If you find this code useful, please make sure to add suitable references to the original DLIB library and the frontalization paper. Bib items for both are:<br />
-<br />
-DLIB<br />
-@article{king2009dlib,<br />
-  title={Dlib-ml: A machine learning toolkit},<br />
-  author={King, Davis E},<br />
-  journal={J. Mach. Learning Research},<br />
-  volume={10},<br />
-  pages={1755--1758},<br />
-  year={2009},<br />
-  publisher={JMLR. org}<br />
-}<br />
-<br />
-Frontalization<br />
-@inproceedings{HHPE:CVPR15:frontalize,<br />
- author    = {Tal Hassner and Shai Harel and Eran Paz and Roee Enbar},<br />
- title     = {Effective Face Frontalization in Unconstrained Images},<br />
- booktitle = {IEEE Conf. on Computer Vision and Pattern Recognition (CVPR)},<br />
- month	=  {June},<br />
- year 	= {2015},<br />
- URL 	= {Available:~http://www.openu.ac.il/home/hassner/projects/frontalize}<br />
-}<br />
+[1] Yuval Nirkin, Iacopo Masi, Anh Tuan Tran, Tal Hassner, Gerard Medioni, [On Face Segmentation, Face Swapping, and Face Perception](https://arxiv.org/pdf/1704.06729.pdf), arXiv preprint.  
+[2] Davis E. King, [Dlib-ml: A Machine Learning Toolkit](http://www.jmlr.org/papers/volume10/king09a/king09a.pdf), Journal of Machine Learning Research, 2009.
