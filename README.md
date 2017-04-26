@@ -6,7 +6,7 @@ Created by Yuval Nirkin.
 [nirkin.com](http://www.nirkin.com/)
 
 ## Overview
-This library provides video\image sequence functionality for finding face landmarks and bounding boxes.
+This library provides video\image sequence functionality for finding face landmarks and bounding boxes using [dlib](http://dlib.net/).
 
 Main features:
 - Matlab interface.
@@ -49,4 +49,5 @@ There are 3 ways to use the library:
 
 ## Bibliography
 [1] Yuval Nirkin, Iacopo Masi, Anh Tuan Tran, Tal Hassner, Gerard Medioni, [On Face Segmentation, Face Swapping, and Face Perception](https://arxiv.org/pdf/1704.06729.pdf), arXiv preprint.  
-[2] Davis E. King, [Dlib-ml: A Machine Learning Toolkit](http://www.jmlr.org/papers/volume10/king09a/king09a.pdf), Journal of Machine Learning Research, 2009.
+[2] Davis E. King, [Dlib-ml: A Machine Learning Toolkit](http://www.jmlr.org/papers/volume10/king09a/king09a.pdf), Journal of Machine Learning Research, 2009.  
+[3] V. Kazemi and J. Sullivan. [One millisecond face alignment with an ensemble of regression trees](http://www.cv-foundation.org/openaccess/content_cvpr_2014/papers/Kazemi_One_Millisecond_Face_2014_CVPR_paper.pdf). In Proc. Conf. Comput.Vision Pattern Recognition. IEEE, 2014
