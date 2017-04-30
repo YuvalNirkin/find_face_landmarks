@@ -1,4 +1,5 @@
 *~
 *.txt.user
 .*
+!.gitignore
 build
