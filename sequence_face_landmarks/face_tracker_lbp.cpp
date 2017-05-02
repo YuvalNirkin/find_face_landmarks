@@ -288,9 +288,9 @@ namespace sfl
                 size_t tracked_ind = i / dists.cols;
                 size_t cand_ind = cand_map[i % dists.cols];
 
-                auto& tracked_it = tracked_indices.find(tracked_ind);
+                auto tracked_it = tracked_indices.find(tracked_ind);
                 if (tracked_it == tracked_indices.end()) continue;
-                auto& cand_it = cand_indices.find(cand_ind);
+                auto cand_it = cand_indices.find(cand_ind);
                 if (cand_it == cand_indices.end()) continue;
 
                 // Match found

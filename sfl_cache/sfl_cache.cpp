@@ -122,13 +122,13 @@ int main(int argc, char* argv[])
 					cv::putText(frame, msg, cv::Point(15, 90),
 						cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
 					
-					cv::putText(frame, "press any key to stop", cv::Point(10, frame.rows - 20),
+					cv::putText(frame, "press escape to stop", cv::Point(10, frame.rows - 20),
 						cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
 
 					// Show frame
 					cv::imshow("sfl_cache", frame);
 					int key = cv::waitKey(1);
-					if (key >= 0) break;
+					if (key == 27) break;
 				}
 			}
 

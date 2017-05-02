@@ -151,13 +151,13 @@ int main(int argc, char* argv[])
                 msg = "Face count: " + std::to_string(faceCounter);
                 cv::putText(frame, msg, cv::Point(15, 40),
                     cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
-                cv::putText(frame, "press any key to stop", cv::Point(10, frame.rows - 20),
+                cv::putText(frame, "press escape to stop", cv::Point(10, frame.rows - 20),
                     cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
 
                 // Show frame
                 cv::imshow("sfl_track", frame);
-                int key = cv::waitKey(30);
-                if (key >= 0) exit(0);
+                int key = cv::waitKey(1);
+                if (key == 27) exit(0);
             }
         }
 
