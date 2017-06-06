@@ -32,6 +32,10 @@ using namespace boost::filesystem;
 
 #define printfFnc(...) { mexPrintf(__VA_ARGS__); mexEvalString("drawnow;");}
 
+// Global variables
+static std::shared_ptr<sfl::SequenceFaceLandmarks> g_sfl;
+static std::string g_landmarksModelPath;
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	try
@@ -43,6 +47,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         int track = 1;
 		float frame_scale = 1.0f;
 		bool preview = true;
+		cv::Mat matlab_img;
 		if (nrhs == 0) throw runtime_error("No parameters specified!");
 		/*
 		if (nrhs < 2) throw runtime_error("Invalid number of parameters!");
@@ -52,6 +57,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			"modelFile must be a string containing the path to the model file!");
 		landmarksModelPath = MxArray(prhs[0]).toString();
 		*/
+		/*
 		if (nrhs == 1)
 		{
 			if (!MxArray(prhs[0]).isChar()) throw runtime_error(
@@ -64,6 +70,39 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				(input.parent_path() / (input.stem() += ".lms")).string();
 			if (!is_regular_file(landmarksPath))
 				throw runtime_error("Couldn't find landmarks file!");
+		}
+		*/
+		if (nrhs == 1)
+		{
+			if (MxArray(prhs[0]).isChar())
+			{
+				inputPath = MxArray(prhs[0]).toString();
+				path input = path(inputPath);
+				if (input.extension() == ".lms")
+				{
+					if(is_regular_file(input)) landmarksPath = inputPath;
+					else throw runtime_error("Couldn't find landmarks file!");
+				}
+				else if (is_regular_file(input))	// Landmarks model file
+				{
+					landmarksModelPath = inputPath;
+				}
+				else	// Try to find landmarks file by replacing the extension
+				{
+					landmarksPath =
+						(input.parent_path() / (input.stem() += ".lms")).string();
+					if (!is_regular_file(landmarksPath))
+						throw runtime_error("Couldn't find landmarks file!");
+				}
+				inputPath.clear();
+			}
+			else if (MxArray(prhs[0]).isUint8() && MxArray(prhs[0]).ndims() > 1)	// Matlab image
+			{
+				if(g_landmarksModelPath.empty()) throw runtime_error(
+					"A landmarks model file must be specified first!");
+				matlab_img = MxArray(prhs[0]).toMat();
+				cv::cvtColor(matlab_img, matlab_img, cv::COLOR_RGB2BGR);
+			}
 		}
 		else if (MxArray(prhs[1]).isChar())			// Dataset
 		{
@@ -89,67 +128,90 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			if (nrhs > 4) frame_scale = (float)MxArray(prhs[4]).toDouble();
             if (nrhs > 5) track = MxArray(prhs[3]).toBool();
 		}
+		else if (MxArray(prhs[1]).isUint8() && MxArray(prhs[1]).ndims() > 1)	// Matlab image
+		{
+			landmarksModelPath = MxArray(prhs[0]).toString();
+			matlab_img = MxArray(prhs[1]).toMat();
+			cv::cvtColor(matlab_img, matlab_img, cv::COLOR_RGB2BGR);
+
+			track = 0;
+			if (nrhs > 2) frame_scale = (float)MxArray(prhs[2]).toDouble();
+		}
 		else throw runtime_error("Second parameter must be either a sequence path or a device id!");
 
 		// Initialize Sequence Face Landmarks
+		if (!landmarksModelPath.empty() && landmarksModelPath != g_landmarksModelPath)
+		{
+			//printfFnc("Initializing landmarks model file...\n");
+			g_landmarksModelPath = landmarksModelPath;
+			g_sfl = sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scale,
+				(sfl::FaceTrackingType)track);
+		}
+		else g_sfl->clear();
+		/*
 		std::shared_ptr<sfl::SequenceFaceLandmarks> sfl =
 			sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scale,
             (sfl::FaceTrackingType)track);
+			*/
 
 		if (landmarksPath.empty())
 		{
-			// Create video source
-			vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
-			std::unique_ptr<vsal::VideoStreamOpenCV> vs(
-				(vsal::VideoStreamOpenCV*)vsf.create(inputPath));
-			if (vs == nullptr) throw runtime_error("No video source specified!");
-
-			// Open video source
-			if (!vs->open()) throw runtime_error("Failed to open video source!");
-
-			// Main loop
-			cv::Mat frame;
-            int frameCounter = 0, faceCounter = 0;
-			while (vs->read())
+			if (matlab_img.empty() && !inputPath.empty())	// Process sequence
 			{
-				if (!vs->isUpdated()) continue;
+				// Create video source
+				vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
+				std::unique_ptr<vsal::VideoStreamOpenCV> vs(
+					(vsal::VideoStreamOpenCV*)vsf.create(inputPath));
+				if (vs == nullptr) throw runtime_error("No video source specified!");
 
-				frame = vs->getFrame();
-				const sfl::Frame& landmarks_frame = sfl->addFrame(frame);
+				// Open video source
+				if (!vs->open()) throw runtime_error("Failed to open video source!");
 
-                // Matlab and OpenCV's GUI do not play well on other playforms
-#ifdef _WIN32
-				if (preview)
+				// Main loop
+				cv::Mat frame;
+				int frameCounter = 0, faceCounter = 0;
+				while (vs->read())
 				{
-					faceCounter += landmarks_frame.faces.size();
+					if (!vs->isUpdated()) continue;
 
-					// Render landmarks
-					sfl::render(frame, landmarks_frame);
+					frame = vs->getFrame();
+					const sfl::Frame& landmarks_frame = g_sfl->addFrame(frame);
 
-                    // Show overlay
-                    string msg = "Frame count: " + std::to_string(++frameCounter);
-                    cv::putText(frame, msg, cv::Point(15, 15),
-                        cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
-                    msg = "Face count: " + std::to_string(faceCounter);
-                    cv::putText(frame, msg, cv::Point(15, 40),
-                        cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
-                    cv::putText(frame, "press any key to stop", cv::Point(10, frame.rows - 20),
-                        cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+					// Matlab and OpenCV's GUI do not play well on other playforms
+#ifdef _WIN32
+					if (preview)
+					{
+						faceCounter += landmarks_frame.faces.size();
 
-					// Show frame
-					cv::imshow("find_face_landmarks", frame);
-					int key = cv::waitKey(1);
-					if (key >= 0) break;
-				}
+						// Render landmarks
+						sfl::render(frame, landmarks_frame);
+
+						// Show overlay
+						string msg = "Frame count: " + std::to_string(++frameCounter);
+						cv::putText(frame, msg, cv::Point(15, 15),
+							cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+						msg = "Face count: " + std::to_string(faceCounter);
+						cv::putText(frame, msg, cv::Point(15, 40),
+							cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+						cv::putText(frame, "press any key to stop", cv::Point(10, frame.rows - 20),
+							cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
+
+						// Show frame
+						cv::imshow("find_face_landmarks", frame);
+						int key = cv::waitKey(1);
+						if (key >= 0) break;
+					}
 #endif  // _WIN32
+				}
 			}
+			else g_sfl->addFrame(matlab_img);	// Process matlab image
 		}
-		else sfl->load(landmarksPath);		
+		else g_sfl->load(landmarksPath);
 
 		///
 		// Output results
 		///
-		const std::list<std::unique_ptr<sfl::Frame>>& sfl_frames = sfl->getSequence();
+		const std::list<std::unique_ptr<sfl::Frame>>& sfl_frames = g_sfl->getSequence();
 
 		// Create the frames as a 1-by-n array of structs.
 		mwSize dims[2] = { 1, 1 };
