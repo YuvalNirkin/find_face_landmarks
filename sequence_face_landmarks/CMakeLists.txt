@@ -26,7 +26,8 @@ endif()
 #	link_libraries(${Boost_LIBRARIES})
 #endif()
 add_library(sequence_face_landmarks ${SFL_SRC} ${SFL_INCLUDE})
-target_include_directories(sequence_face_landmarks PUBLIC 
+target_include_directories(sequence_face_landmarks PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 	${Boost_INCLUDE_DIRS}
 	${OpenCV_INCLUDE_DIRS}
 	${dlib_INCLUDE_DIRS}
@@ -41,7 +42,6 @@ if(PROTOBUF_FOUND)
 	target_include_directories(sequence_face_landmarks PUBLIC ${PROTOBUF_INCLUDE_DIRS})
 	target_link_libraries(sequence_face_landmarks PUBLIC ${PROTOBUF_LIBRARIES})
 endif()
-set_target_properties(sequence_face_landmarks PROPERTIES DEBUG_POSTFIX _d)
 
 # Installations
 install(TARGETS sequence_face_landmarks

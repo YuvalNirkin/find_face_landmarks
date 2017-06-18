@@ -11,10 +11,6 @@
 #include <sfl/face_tracker.h>
 #include <sfl/utilities.h>
 
-// vsal
-#include <vsal/VideoStreamFactory.h>
-#include <vsal/VideoStreamOpenCV.h>
-
 // OpenCV
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -116,24 +112,15 @@ int main(int argc, char* argv[])
         else throw runtime_error("Couldn't find video sequence file!");
 
 		// Create video source
-		vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
-		std::unique_ptr<vsal::VideoStreamOpenCV> vs(
-			(vsal::VideoStreamOpenCV*)vsf.create(videoPath));
-		if (vs == nullptr) throw runtime_error("No video source specified!");
-
-		// Open video source
-		if (!vs->open()) throw runtime_error("Failed to open video source!");
+		cv::VideoCapture video_reader(videoPath);
 
 		// Preview loop
 		cv::Mat frame;
 		int frameCounter = 0, faceCounter = 0;
 		std::list<std::unique_ptr<sfl::Frame>>& sfl_frames = sfl->getSequenceMutable();
 		std::list<std::unique_ptr<sfl::Frame>>::iterator it = sfl_frames.begin();
-        while (it != sfl_frames.end() && vs->read())
+        while (it != sfl_frames.end() && video_reader.read(frame))
         {
-            if (!vs->isUpdated()) continue;
-
-            frame = vs->getFrame();
             std::unique_ptr<sfl::Frame>& sfl_frame = *it++;
             faceCounter += sfl_frame->faces.size();
 

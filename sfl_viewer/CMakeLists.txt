@@ -3,10 +3,6 @@ if(NOT Boost_FOUND)
 	message(STATUS "sfl_viewer won't be built because Boost is missing.")
 	return()
 endif()
-if(NOT vsal_FOUND)
-	message(STATUS "sfl_viewer won't be built because vsal is missing.")
-	return()
-endif()
 if(NOT PROTOBUF_FOUND)
 	message(STATUS "sfl_viewer won't be built because protobuf is missing.")
 	return()
@@ -37,13 +33,11 @@ endif()
 add_executable(sfl_viewer WIN32 ${SFL_VIEWER_SRC} ${SFL_VIEWER_HDR}
 	${SFL_VIEWER_HDR_MOC} ${SFL_VIEWER_UI_MOC} ${SFL_VIEWER_QRC})
 target_include_directories(sfl_viewer PRIVATE 
-	${CMAKE_SOURCE_DIR}/sequence_face_landmarks
 	${CMAKE_SOURCE_DIR}/sfl_viewer
 	${CMAKE_BINARY_DIR}/sfl_viewer
-	${VSAL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+	${Boost_INCLUDE_DIRS})
 target_link_libraries(sfl_viewer PRIVATE 
-	sequence_face_landmarks ${VSAL_LIBRARIES} Qt5::Widgets)
-set_target_properties(sfl_viewer PROPERTIES DEBUG_POSTFIX _d)
+	sequence_face_landmarks Qt5::Widgets)
 
 # Installations
 install(TARGETS sfl_viewer EXPORT find_face_landmarks-targets DESTINATION bin COMPONENT bin)

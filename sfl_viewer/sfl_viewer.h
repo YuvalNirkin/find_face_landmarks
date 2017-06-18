@@ -4,10 +4,11 @@
 #include "ui_sfl_viewer.h"
 #include "sfl_viewer_states.h"
 
-#include <vsal/VideoStreamOpenCV.h>
 #include <sfl/sequence_face_landmarks.h>
 
 #include <string>
+
+#include <opencv2/videoio.hpp>
 
 // Qt
 
@@ -45,7 +46,7 @@ namespace sfl
         std::string landmarks_path;
 
         // Video
-        std::unique_ptr<vsal::VideoStreamOpenCV> vs;
+		std::unique_ptr<cv::VideoCapture> video_reader;
         cv::Mat frame, resized_frame, landmarks_render_frame;
         cv::Mat render_frame;
         std::unique_ptr<QImage> render_image;

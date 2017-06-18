@@ -32,7 +32,7 @@ namespace sfl
 
     sc::result Inactive::react(const EvStart &)
     {
-        if (viewer->vs == nullptr || viewer->sfl == nullptr)
+        if (viewer->video_reader == nullptr || viewer->sfl == nullptr)
         {
             QMessageBox msgBox;
             msgBox.setText("Failed to open sequence sources.");
@@ -52,13 +52,12 @@ namespace sfl
     {
         if (event.i < 0 || event.i >= viewer->total_frames) return;
 
-        viewer->vs->seek(event.i);
-        if (viewer->vs->read())
+		viewer->video_reader->set(cv::CAP_PROP_POS_FRAMES, (double)event.i);
+		if(viewer->video_reader->read(viewer->frame))
         {
             viewer->curr_frame_pos = event.i;
             viewer->frame_slider->setValue(viewer->curr_frame_pos);
             viewer->curr_frame_lbl->setText(std::to_string(viewer->curr_frame_pos).c_str());
-            viewer->frame = viewer->vs->getFrame();
             post_event(EvUpdate());
         }
     }
@@ -66,17 +65,20 @@ namespace sfl
     void Active::onStart(const EvStart & event)
     {
         // Reshape window
-        viewer->display->setMinimumSize(viewer->vs->getWidth(), viewer->vs->getHeight());
+		int width = (int)viewer->video_reader->get(cv::CAP_PROP_FRAME_WIDTH);
+		int height = (int)viewer->video_reader->get(cv::CAP_PROP_FRAME_HEIGHT);
+        viewer->display->setMinimumSize(width, height);
         viewer->adjustSize();
 
         // Read first video frame
         viewer->curr_frame_pos = 0;
-        viewer->total_frames = viewer->vs->size();
-        viewer->fps = viewer->vs->getFPS();
+        viewer->total_frames = (int)viewer->video_reader->get(cv::CAP_PROP_FRAME_COUNT);
+		viewer->fps = viewer->video_reader->get(cv::CAP_PROP_FPS);
         if (viewer->fps < 1.0) viewer->fps = 30.0;
-        viewer->vs->seek(viewer->curr_frame_pos);
-        if (viewer->vs->read())
-            viewer->frame = viewer->vs->getFrame();
+		viewer->video_reader->set(cv::CAP_PROP_POS_FRAMES, (double)viewer->curr_frame_pos);
+		viewer->video_reader->read(viewer->frame);
+//        if (viewer->vs->read())
+//            viewer->frame = viewer->vs->getFrame();
 
         // Initialize render frame
         QSize displaySize = viewer->display->size();
@@ -141,13 +143,12 @@ namespace sfl
             return;
         }
 
-        if (viewer->vs->read())
-        {
-            viewer->frame_slider->setValue(++viewer->curr_frame_pos);
-            viewer->curr_frame_lbl->setText(std::to_string(viewer->curr_frame_pos).c_str());
-            viewer->frame = viewer->vs->getFrame();
-            post_event(EvUpdate());
-        }
+		if (viewer->video_reader->read(viewer->frame))
+		{
+			viewer->frame_slider->setValue(++viewer->curr_frame_pos);
+			viewer->curr_frame_lbl->setText(std::to_string(viewer->curr_frame_pos).c_str());
+			post_event(EvUpdate());
+		}
     }
 }   // namespace sfl
 

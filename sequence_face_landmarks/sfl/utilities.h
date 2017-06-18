@@ -157,6 +157,14 @@ namespace sfl
     void createFullFace(const std::vector<cv::Point>& landmarks,
         std::vector<cv::Point>& full_face);
 
+	/**	If the specified string is a number in [0, 9] return that number
+	else return -1.
+	*/
+	inline int getDeviceID(const std::string& s)
+	{
+		return (s.size() == 1 && std::isdigit(s[0])) ? (int)(s[0] - '0') : -1;
+	}
+
 }   // namespace sfl
 
 #endif	// __SFL_UTILITIES__

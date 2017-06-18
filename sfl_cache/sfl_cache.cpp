@@ -11,10 +11,6 @@
 #include <sfl/sequence_face_landmarks.h>
 #include <sfl/utilities.h>
 
-// vsal
-#include <vsal/VideoStreamFactory.h>
-#include <vsal/VideoStreamOpenCV.h>
-
 // OpenCV
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -84,22 +80,13 @@ int main(int argc, char* argv[])
 		for (auto& sfl : sfls)
 		{
 			// Create video source
-			vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
-			std::unique_ptr<vsal::VideoStreamOpenCV> vs(
-				(vsal::VideoStreamOpenCV*)vsf.create(inputPath));
-			if (vs == nullptr) throw runtime_error("No video source specified!");
-
-			// Open video source
-			if (!vs->open()) throw runtime_error("Failed to open video source!");
+			cv::VideoCapture video_reader(inputPath);
 
 			// Main loop
 			cv::Mat frame;
 			int frameCounter = 0, faceCounter = 0;
-			while (vs->read())
+			while (video_reader.read(frame))
 			{
-				if (!vs->isUpdated()) continue;
-
-				frame = vs->getFrame();
 				const sfl::Frame& landmarks_frame = sfl->addFrame(frame);
                 faceCounter += landmarks_frame.faces.size();
 

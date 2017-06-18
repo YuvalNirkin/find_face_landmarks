@@ -4,12 +4,6 @@ if(NOT Boost_FOUND)
 	return()
 endif()
 
-# Validation
-if(NOT vsal_FOUND)
-	message(STATUS "find_face_landmarks won't be built because vsal is missing.")
-	return()
-endif()
-
 # Add mex target
 if(WIN32)
 	link_directories(${Boost_LIBRARY_DIRS})
@@ -25,6 +19,7 @@ target_include_directories(find_face_landmarks PRIVATE
 	${Matlab_INCLUDE_DIRS} ${VSAL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 target_link_libraries(find_face_landmarks sequence_face_landmarks 
 	${Matlab_LIBRARIES} ${VSAL_LIBRARIES})
+set_target_properties(find_face_landmarks PROPERTIES DEBUG_POSTFIX "")
 
 # Installations
 if(MSVC)

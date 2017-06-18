@@ -1,5 +1,4 @@
 #include "sfl_viewer.h"
-#include <vsal/VideoStreamFactory.h>
 #include <sfl/utilities.h>
 
 #include <exception>
@@ -74,21 +73,20 @@ namespace sfl
         sm.process_event(EvStart());
     }
 
-    void Viewer::initVideoSource(const std::string & _sequence_path)
+    void Viewer::initVideoSource(const std::string& _sequence_path)
     {
         if (!is_regular_file(_sequence_path)) return;
         if (sequence_path == _sequence_path) return;
 
-        vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
-        vs.reset((vsal::VideoStreamOpenCV*)vsf.create(_sequence_path));
-        if (vs != nullptr && !vs->open()) vs = nullptr;
-        else
-        {
-            sequence_path = _sequence_path;
-            path input = path(sequence_path);
-            initLandmarks((input.parent_path() / (input.stem() += ".lms")).string());
-            sm.process_event(EvStart());
-        }
+		video_reader.reset(new cv::VideoCapture());
+		if (!video_reader->open(_sequence_path)) video_reader = nullptr;
+		else
+		{
+			sequence_path = _sequence_path;
+			path input = path(sequence_path);
+			initLandmarks((input.parent_path() / (input.stem() += ".lms")).string());
+			sm.process_event(EvStart());
+		}
     }
 
     void Viewer::resizeEvent(QResizeEvent* event)

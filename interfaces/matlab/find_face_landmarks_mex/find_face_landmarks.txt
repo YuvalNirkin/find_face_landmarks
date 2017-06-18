@@ -30,18 +30,15 @@
 %   Examples
 %       modelFile = 'shape_predictor_68_face_landmarks.dat';
 %
-%       % Matlab image
-%       I = imread('dataset_dir/img01.jpg')
+%       % matlab image
+%       I = imread('dataset_dir/img_01.jpg')
 %       frames = find_face_landmarks(modelFile, I);
 %
 %       % single image
-%       frames = find_face_landmarks(modelFile, 'dataset_dir/img01.jpg');      
+%       frames = find_face_landmarks(modelFile, 'dataset_dir/img_01.jpg');      
 %
-%       % regular expression (only jpg images)
-%       frames = find_face_landmarks(modelFile, 'dataset_dir/.*jpg');
-%
-%       % all images in a directory
-%       frames = find_face_landmarks(modelFile, 'dataset_dir');
+%       % multiple images (img_00.jpg, img_01.jpg, img_02.jpg, ...)
+%       frames = find_face_landmarks(modelFile, 'dataset_dir/img_%02d.jpg');
 %
 %       % video file
 %       frames = find_face_landmarks(modelFile, 'video.mp4');
@@ -50,9 +47,9 @@
 %       frames = find_face_landmarks(modelFile, 0);
 %
 %       % Load from cache
-%       frames = find_face_landmarks('video_landmarks.pb');
+%       frames = find_face_landmarks('video.lms');
 %
-%       % Load from cache by searching for 'video_landmarks.pb'
+%       % Load from cache by searching for 'video.lms'
 %       frames = find_face_landmarks('video.mp4');
 %
 %       % Initialize landmarks model file to save time for future calls

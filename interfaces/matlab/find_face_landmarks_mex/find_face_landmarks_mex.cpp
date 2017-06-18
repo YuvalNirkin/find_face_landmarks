@@ -12,10 +12,6 @@
 #include <sfl/sequence_face_landmarks.h>
 #include <sfl/utilities.h>
 
-// vsal
-#include <vsal/VideoStreamFactory.h>
-#include <vsal/VideoStreamOpenCV.h>
-
 // OpenCV
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -49,29 +45,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		bool preview = true;
 		cv::Mat matlab_img;
 		if (nrhs == 0) throw runtime_error("No parameters specified!");
-		/*
-		if (nrhs < 2) throw runtime_error("Invalid number of parameters!");
-
-		
-		if (!MxArray(prhs[0]).isChar()) throw runtime_error(
-			"modelFile must be a string containing the path to the model file!");
-		landmarksModelPath = MxArray(prhs[0]).toString();
-		*/
-		/*
-		if (nrhs == 1)
-		{
-			if (!MxArray(prhs[0]).isChar()) throw runtime_error(
-				"inputPath must be sequence path or a landmarks cache file (.pb)!");
-			inputPath = MxArray(prhs[0]).toString();
-
-			path input = path(inputPath);
-			if (input.extension() == ".lms") landmarksPath = inputPath;
-			else landmarksPath =
-				(input.parent_path() / (input.stem() += ".lms")).string();
-			if (!is_regular_file(landmarksPath))
-				throw runtime_error("Couldn't find landmarks file!");
-		}
-		*/
 		if (nrhs == 1)
 		{
 			if (MxArray(prhs[0]).isChar())
@@ -101,13 +74,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				if(g_landmarksModelPath.empty()) throw runtime_error(
 					"A landmarks model file must be specified first!");
 				matlab_img = MxArray(prhs[0]).toMat();
-				cv::cvtColor(matlab_img, matlab_img, cv::COLOR_RGB2BGR);
+				if(matlab_img.channels() == 3)
+					cv::cvtColor(matlab_img, matlab_img, cv::COLOR_RGB2BGR);
 			}
 		}
 		else if (MxArray(prhs[1]).isChar())			// Dataset
 		{
 			landmarksModelPath = MxArray(prhs[0]).toString();
 			inputPath = MxArray(prhs[1]).toString();
+			device = sfl::getDeviceID(inputPath);
 			if (nrhs > 2) frame_scale = (float)MxArray(prhs[2]).toDouble();
 			if (nrhs > 3) track = MxArray(prhs[3]).toInt();
             if (nrhs > 4) preview = MxArray(prhs[4]).toBool();
@@ -132,7 +107,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		{
 			landmarksModelPath = MxArray(prhs[0]).toString();
 			matlab_img = MxArray(prhs[1]).toMat();
-			cv::cvtColor(matlab_img, matlab_img, cv::COLOR_RGB2BGR);
+			if (matlab_img.channels() == 3)
+				cv::cvtColor(matlab_img, matlab_img, cv::COLOR_RGB2BGR);
 
 			track = 0;
 			if (nrhs > 2) frame_scale = (float)MxArray(prhs[2]).toDouble();
@@ -148,36 +124,24 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				(sfl::FaceTrackingType)track);
 		}
 		else g_sfl->clear();
-		/*
-		std::shared_ptr<sfl::SequenceFaceLandmarks> sfl =
-			sfl::SequenceFaceLandmarks::create(landmarksModelPath, frame_scale,
-            (sfl::FaceTrackingType)track);
-			*/
 
 		if (landmarksPath.empty())
 		{
-			if (matlab_img.empty() && !inputPath.empty())	// Process sequence
+			if (matlab_img.empty() && (!inputPath.empty() || device >= 0))	// Process sequence
 			{
 				// Create video source
-				vsal::VideoStreamFactory& vsf = vsal::VideoStreamFactory::getInstance();
-				std::unique_ptr<vsal::VideoStreamOpenCV> vs(
-					(vsal::VideoStreamOpenCV*)vsf.create(inputPath));
-				if (vs == nullptr) throw runtime_error("No video source specified!");
-
-				// Open video source
-				if (!vs->open()) throw runtime_error("Failed to open video source!");
+				cv::VideoCapture video_reader;
+				if (device >= 0) video_reader.open(device);
+				else video_reader.open(inputPath);
 
 				// Main loop
 				cv::Mat frame;
 				int frameCounter = 0, faceCounter = 0;
-				while (vs->read())
+				while (video_reader.read(frame))
 				{
-					if (!vs->isUpdated()) continue;
-
-					frame = vs->getFrame();
 					const sfl::Frame& landmarks_frame = g_sfl->addFrame(frame);
 
-					// Matlab and OpenCV's GUI do not play well on other playforms
+					// Matlab and OpenCV's GUI do not play well on other platforms
 #ifdef _WIN32
 					if (preview)
 					{
@@ -193,13 +157,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 						msg = "Face count: " + std::to_string(faceCounter);
 						cv::putText(frame, msg, cv::Point(15, 40),
 							cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
-						cv::putText(frame, "press any key to stop", cv::Point(10, frame.rows - 20),
+						cv::putText(frame, "press escape to stop", cv::Point(10, frame.rows - 20),
 							cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 102, 255), 1, CV_AA);
 
 						// Show frame
 						cv::imshow("find_face_landmarks", frame);
-						int key = cv::waitKey(1);
-						if (key >= 0) break;
+						if (cv::waitKey(1) == 27) break;
 					}
 #endif  // _WIN32
 				}
