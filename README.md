@@ -36,7 +36,6 @@ There are 3 ways to use the library:
 | [Boost](http://www.boost.org/)                                     | 1.47            |                                          |
 | [OpenCV](http://opencv.org/)                                       | 3.0             |                                          |
 | [dlib](https://github.com/davisking/dlib) or [dlib (Windows)](https://github.com/YuvalNirkin/dlib) | 18.18 |                    |
-| [vsal](https://github.com/YuvalNirkin/vsal)                        | 1.0             |                                          |
 | [OpenCV's extra modules](https://github.com/opencv/opencv_contrib) | 3.0             | Optional - For the LBP face tracker      |
 | [protobuf](https://github.com/google/protobuf)                     | 3.0.0           | Optional - For loading and saving        |
 | [Matlab](http://www.mathworks.com/products/matlab/)                | 2012a           | Optional - For building the MEX function |
