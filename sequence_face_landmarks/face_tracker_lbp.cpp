@@ -193,7 +193,13 @@ namespace sfl
             std::unique_ptr<TrackedFaceLBP> tracked_face = std::make_unique<TrackedFaceLBP>();
             tracked_face->id = m_id_counter++;
             tracked_face->frame_id = frame_id;
-            tracked_face->model = cv::face::createLBPHFaceRecognizer(3, 8, 8, 8);
+			
+			// Note: LBPHFaceRecognizer interface changed in OpenCV version 3.3.0
+#if CV_MAJOR_VERSION <= 3 && CV_MINOR_VERSION <= 2
+            //tracked_face->model = cv::face::createLBPHFaceRecognizer(3, 8, 8, 8);
+#else
+			tracked_face->model = cv::face::LBPHFaceRecognizer::create(3, 8, 8, 8);
+#endif
             tracked_face->pos = candidate.pos;
             tracked_face->tracking_lost = false;
 
