@@ -1,5 +1,5 @@
 # Find Face Landmarks
-![alt text](https://yuvalnirkin.github.io/assets/img/projects/find_face_landmarks/thumb.jpg "Demonstration")
+![alt text](https://yuvalnirkin.github.io/assets/img/projects/find_face_landmarks_teaser.jpg "Demonstration")
 
 Created by Yuval Nirkin.
 
@@ -27,7 +27,7 @@ Please see [project page](http://www.openu.ac.il/home/hassner/projects/faceswap/
 ## Usage
 There are 3 ways to use the library:
 - Matlab interface. Please take a look at the [MATLAB Tutorial](https://github.com/YuvalNirkin/find_face_landmarks/wiki/MATLAB-Tutorial).
-- C++ interface. Please take a look at the [Doxygen generated documentation](https://yuvalnirkin.github.io/projects/find_face_landmarks/).
+- C++ interface. Please take a look at the [Doxygen generated documentation](https://yuvalnirkin.github.io/docs/find_face_landmarks/).
 - Command line tools. Use --help for more information on each tool.
 
 ## Dependencies
