@@ -20,7 +20,7 @@ Link for the demonstration video:
 
 If you find this code useful, please make sure to cite our paper in your work:
 
-Yuval Nirkin, Iacopo Masi, Anh Tuan Tran, Tal Hassner, Gerard Medioni, "[On Face Segmentation, Face Swapping, and Face Perception](https://arxiv.org/pdf/1704.06729.pdf)", arXiv preprint arXiv:1704.06729, 22 Apr 2017.
+Yuval Nirkin, Iacopo Masi, Anh Tuan Tran, Tal Hassner, Gerard Medioni, "[On Face Segmentation, Face Swapping, and Face Perception](https://arxiv.org/pdf/1704.06729.pdf)", IEEE Conference on Automatic Face and Gesture Recognition (FG), Xi'an, China on May 2018
 
 Please see [project page](http://www.openu.ac.il/home/hassner/projects/faceswap/) for more details, more resources and updates on this project.
 
